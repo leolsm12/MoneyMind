@@ -2,8 +2,11 @@ package com.example.financeAPI.controller;
 
 import com.example.financeAPI.model.Usuario;
 import com.example.financeAPI.repository.UsuarioRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,23 +33,26 @@ public class UsuarioController {
     }
 
     @PostMapping
-    public Usuario criarUsuario(@RequestBody Usuario usuario) {
-        return usuarioRepository.save(usuario);
+    public ResponseEntity<Usuario> criarUsuario(@RequestBody Usuario usuario) {
+        Usuario novoUsuario = usuarioRepository.save(usuario);
+        return ResponseEntity.status(HttpStatus.CREATED).body(novoUsuario);
     }
 
-    @PutMapping("/{id}")
+
+   @PutMapping("/{id}")
     public ResponseEntity<Usuario> atualizarUsuario(@PathVariable Long id, @RequestBody Usuario usuarioAtualizado) {
         return usuarioRepository.findById(id)
                 .map(usuario -> {
                     usuario.setNome(usuarioAtualizado.getNome());
                     usuario.setEmail(usuarioAtualizado.getEmail());
                     usuario.setSenha(usuarioAtualizado.getSenha());
+                    usuario.setDataNascimento(usuarioAtualizado.getDataNascimento());
                     return ResponseEntity.ok(usuarioRepository.save(usuario));
                 }).orElse(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletarUsuario(@PathVariable Long id) {
+    public ResponseEntity<Object> deletarUsuario(@PathVariable Long id) {
         return usuarioRepository.findById(id)
                 .map(usuario -> {
                     usuarioRepository.delete(usuario);
