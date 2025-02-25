@@ -15,6 +15,9 @@ public class Lancamento {
     @JoinColumn(name = "tipo_id", nullable = false)
     private Tipo tipo; // Referência ao tipo de receita
 
+    @Column(name = "descricao", nullable = false)
+    private String descricao;
+
     @Column(name = "valor", nullable = false)
     private Double valor;
 
@@ -26,6 +29,7 @@ public class Lancamento {
     private Usuario usuario; // Relacionamento com o usuário
 
     public Long getId() {
+
         return id;
     }
 
@@ -39,6 +43,14 @@ public class Lancamento {
 
     public void setTipo(Tipo tipo) {
         this.tipo = tipo;
+    }
+
+    public String getDescricao() {
+        return descricao;
+    }
+
+    public void setDescricao(String descricao) {
+        this.descricao = descricao;
     }
 
     public Double getValor() {
