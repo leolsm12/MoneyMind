@@ -1,41 +1,60 @@
 // components/BarChartResumo.tsx
 import React from 'react';
 import { Dimensions, Text, View } from 'react-native';
-import { BarChart } from 'react-native-chart-kit';
+import { LineChart } from 'react-native-chart-kit';
 
-const screenWidth = Dimensions.get('window').width;
+const screenWidth = Dimensions.get('window').width - 32;
+const data = {
+  labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom'],
+  datasets: [
+    {
+      data: [3500, 1200, 1800, 2000, -1500, -2500, 3000]
+    }
+  ]
+};
 
-const BarChartResumo = () => {
+interface BarChartResumoProps {
+  data: {
+    labels: string[];
+    datasets: { data: number[] }[];
+  };
+}
+
+const BarChartResumo: React.FC<BarChartResumoProps> = ({ data }) => {
   return (
     <View>
-      <Text style={{ marginLeft: 16, fontWeight: 'bold' }}>Resumo da Semana</Text>
-      <BarChart
-        data={{
-          labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex'],
-          datasets: [
-            {
-              data: [2500, 1200, 1800, 2000, 1500],
+        <Text style={{ textAlign: 'center', fontWeight: 'bold', fontSize: 16 }}>
+          Resumo semanal
+        </Text>
+        <LineChart
+          data={data}
+          width={screenWidth} // from react-native
+          height={220}
+          yAxisLabel="R$"
+          yAxisSuffix=""
+          yAxisInterval={1} // optional, defaults to 1
+          chartConfig={{
+            backgroundColor: "#e26a00",
+            backgroundGradientFrom: "#bfbbb8",
+            backgroundGradientTo: "#94918e",
+            decimalPlaces: 0, // optional, defaults to 2dp
+            color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+            labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
+            style: {
+              borderRadius: 16
             },
-          ],
-        }}
-        width={screenWidth - 32}
-        height={220}
-        yAxisLabel="R$"
-        yAxisSuffix=""
-        chartConfig={{
-          backgroundColor: '#ffffff',
-          backgroundGradientFrom: '#ffffff',
-          backgroundGradientTo: '#ffffff',
-          decimalPlaces: 2,
-          color: (opacity = 1) => `rgba(46, 204, 113, ${opacity})`,
-          labelColor: () => '#333',
-        }}
-        style={{
-          marginVertical: 8,
-          borderRadius: 16,
-          alignSelf: 'center',
-        }}
-      />
+            propsForDots: {
+              r: "6",
+              strokeWidth: "1",
+              stroke: "#000"
+            }
+          }}
+          bezier
+          style={{
+            marginVertical: 8,
+            borderRadius: 16
+          }}
+        />
     </View>
   );
 };

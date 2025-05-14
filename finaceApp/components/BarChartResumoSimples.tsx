@@ -28,24 +28,29 @@ const BarChartResumoSimples: React.FC<Props> = ({ ganhos, gastos }) => {
         Comparativo Financeiro
       </Text>
       <Svg height={height} width={barWidth}>
-        {/* Barra de Gastos */}
+        {/* Barra de Gastos (arredonda só lado esquerdo) */}
         <Rect
           x="0"
           y="0"
           width={gastoWidth}
           height={height}
-          fill="#e74c3c" // Vermelho para gastos
+          fill="#e74c3c"
+          
         />
-        {/* Barra de Saldo */}
+    
+        {/* Barra de Saldo (arredonda só lado direito) */}
         <Rect
           x={gastoWidth}
           y="0"
           width={saldoWidth}
           height={height}
-          fill="#3498db" // Azul para saldo
+          fill="#3498db"
+          
         />
       </Svg>
     </View>
+
+
   );
 };
 

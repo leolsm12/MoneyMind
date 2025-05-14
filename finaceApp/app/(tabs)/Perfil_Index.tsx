@@ -1,9 +1,11 @@
+import { ThemedView } from '@/components/ThemedView';
 import { Ionicons } from '@expo/vector-icons'; // Ícone de '+'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
+import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { styles } from './_Perfil_style'; // Importando o arquivo de estilos
+import { styles } from '../../styles/_Perfil_style'; // Importando o arquivo de estilos
 
 export default function PerfilScreen() {
   const [imagemUri, setImagemUri] = useState<string | null>(null);
@@ -42,13 +44,13 @@ export default function PerfilScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <ThemedView style={styles.container}>
       <View style={styles.fotoContainer}>
         <Image
           source={
             imagemUri
               ? { uri: imagemUri }
-              : require('../../../assets/images/avatars/avatar1.jpg') // imagem padrão
+              : require('../../assets/images/avatars/avatar1.jpg') // imagem padrão
           }
           style={styles.foto}
         />
@@ -83,6 +85,15 @@ export default function PerfilScreen() {
       >
         <Text style={styles.textoBotao}>{editando ? 'Salvar alterações' : 'Editar perfil'}</Text>
       </TouchableOpacity>
-    </View>
+      <TouchableOpacity
+        style={[styles.botaoEditar, { backgroundColor: '#ff4d4d', marginTop: 12 }]}
+        onPress={() => {
+          router.replace('/Login_Index');
+        }}
+      >
+        <Text style={styles.textoBotao}>Sair</Text>
+      </TouchableOpacity>
+
+    </ThemedView>
   );
 }

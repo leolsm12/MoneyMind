@@ -1,8 +1,9 @@
 import BarChartResumoSimples from '@/components/BarChartResumoSimples';
 import FormularioFinanceiro from '@/components/FormularioFinanceiro';
+import { ThemedView } from '@/components/ThemedView';
 import React, { useState } from 'react';
 import { FlatList, Text, TouchableOpacity, View } from 'react-native';
-import { styles } from './_Ganhos_style';
+import { styles } from '../../styles/_Ganhos_style';
 
 export default function GanhosScreen() {
   const [showModal, setShowModal] = useState(false);
@@ -41,7 +42,7 @@ export default function GanhosScreen() {
   
 
   return (
-    <View style={styles.container}>
+    <ThemedView style={styles.container}>
       <Text style={styles.title}>Total de Ganhos</Text>
 
       <BarChartResumoSimples ganhos={totalGanhos} gastos={0} />
@@ -102,6 +103,6 @@ export default function GanhosScreen() {
           { id: 'meta', tipo: 'input', placeholder: metaGanhos.toString() },
         ]}
       />
-    </View>
+    </ThemedView>
   );
 }

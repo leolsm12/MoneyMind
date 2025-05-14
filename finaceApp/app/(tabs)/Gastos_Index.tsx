@@ -1,9 +1,9 @@
 import BarChartResumoSimples from '@/components/BarChartResumoSimples'; // Importando o gráfico de resumo
-import CustomButton from '@/components/CustomButton'; // Importando o botão customizado
 import FormularioFinanceiro from '@/components/FormularioFinanceiro'; // Importando o FormulárioFinanceiro
+import { ThemedView } from '@/components/ThemedView';
 import React, { useState } from 'react';
-import { Alert, FlatList, Modal, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { styles } from './_Gastos_style'; // Importando o estilo
+import { Alert, FlatList, Text, TouchableOpacity, View } from 'react-native';
+import { styles } from '../../styles/_Gastos_style'; // Importando o estilo
 
 export default function GastosScreen() {
   const [showOptions, setShowOptions] = useState(false); // Para controlar a visibilidade do modal de opções
@@ -40,16 +40,20 @@ export default function GastosScreen() {
   };
 
   // Função de salvar a meta de gastos
-  const handleSaveMeta = () => {
-    const parsedValue = parseFloat(novoValorMeta);
+  const handleSaveMeta = (dados: Record<string, string | number>) => {
+    const valor = dados.meta;
+    const parsedValue = typeof valor === 'string' ? parseFloat(valor) : valor;
+  
     if (!isNaN(parsedValue)) {
       setMetaGastos(parsedValue);
+      console.log('Meta de ganhos atualizada:', parsedValue);
     }
+  
     setShowMetaModal(false);
   };
 
   return (
-    <View style={styles.container}>
+    <ThemedView style={styles.container}>
       <Text style={styles.title}>Total de Gastos</Text>
 
       {/* Gráfico de Barra com Gastos */}
@@ -127,24 +131,17 @@ export default function GastosScreen() {
          />
 
       {/* Modal de Meta */}
-      <Modal visible={showMetaModal} animationType="slide" onRequestClose={() => setShowMetaModal(false)}>
-        <View style={styles.modalContainer}>
-          <Text style={styles.modalTitle}>Defina sua Meta de Gastos</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Meta de Ganhos"
-            keyboardType="numeric"
-            value={novoValorMeta}
-            onChangeText={setNovoValorMeta}
-          />
-          <View style={styles.buttonContainer}>
-            <CustomButton title="Cancelar" color="#e74c3c" onPress={() => setShowMetaModal(false)} />
-            <CustomButton title="Salvar" color="#2ecc71" onPress={handleSaveMeta} />
-          </View>
-        </View>
-      </Modal>
-    </View>
+      <FormularioFinanceiro
+        visible={showMetaModal}
+        onClose={() => setShowMetaModal(false)}
+        onSave={handleSaveMeta}
+        titulo="Nova Meta de Gastos"
+        corBotao="#009FB7"
+        campos={[
+          { id: 'meta', tipo: 'input', placeholder: metaGastos.toString() },
+        ]}
+      />
+    </ThemedView>
   );
 
-  
 }

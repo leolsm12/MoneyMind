@@ -28,28 +28,28 @@ export default function TabLayout() {
         }),
       }}>
       <Tabs.Screen
-        name="Home/Home_Index"
+        name="Home_Index"
         options={{
           title: 'Home',
           tabBarIcon: ({ color }) => <Feather name="home" size={24} color={color} />,
         }}
       />
       <Tabs.Screen
-        name="Ganhos/Ganhos_Index"
+        name="Ganhos_Index"
         options={{
           title: 'Ganhos',
           tabBarIcon: ({ color }) => <Ionicons name="cash-outline" size={24} color={color} />,
         }}
       />
       <Tabs.Screen
-        name="Gastos/Gastos_Index"
+        name="Gastos_Index"
         options={{
           title: 'Gastos',
           tabBarIcon: ({ color }) => <Ionicons name="wallet-outline" size={24} color={color} />,
         }}
       />
       <Tabs.Screen
-        name="Perfil/Perfil_Index"
+        name="Perfil_Index"
         options={{
           title: 'Perfil',
           tabBarIcon: ({ color }) => <Ionicons name="person-circle-outline" size={24} color={color} />,

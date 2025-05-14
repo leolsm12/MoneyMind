@@ -6,7 +6,6 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
-    backgroundColor: '#f2f2f2',
   },
   fotoContainer: {
     position: 'relative',
@@ -21,7 +20,7 @@ export const styles = StyleSheet.create({
     backgroundColor: '#ccc',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.5,
     shadowRadius: 5,
     elevation: 6,
   },
