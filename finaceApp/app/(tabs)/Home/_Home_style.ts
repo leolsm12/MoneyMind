@@ -3,7 +3,7 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingTop: 60,
+    paddingTop: 15,
     paddingHorizontal: 20,
     backgroundColor: '#f8f9fa',
     alignItems: 'center',
@@ -44,5 +44,13 @@ export const styles = StyleSheet.create({
     fontSize: 22,
     fontWeight: 'bold',
     marginTop: 5,
+  },
+  logo: {
+    width: 150,
+    height: 150,
+    resizeMode: 'contain',
+    alignSelf: 'center',
+    marginBottom: 0,
+    marginTop: 0,
   },
 });

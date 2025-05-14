@@ -3,6 +3,7 @@ import BarChartResumoSimples from '@/components/BarChartResumoSimples';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { useNavigation } from 'expo-router';
+import { Image } from 'react-native';
 import { styles } from './_Home_style';
 
 export default function HomeScreen() {
@@ -14,9 +15,10 @@ export default function HomeScreen() {
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedText type="title" style={styles.title}>
-        MoneyMind
-      </ThemedText>
+      <Image
+        source={require('@/assets/images/MoneyMindLogo.png')} // ou o caminho da sua imagem
+        style={styles.logo}
+      />
 
       <ThemedView style={styles.card}>
         <ThemedText style={styles.label}>Ganhos:</ThemedText>
