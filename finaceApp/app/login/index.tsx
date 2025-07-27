@@ -2,7 +2,7 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather'; // Expo já tem esse pacote
-import { styles } from '../styles/_Login_style';
+import styles from './style';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -12,7 +12,7 @@ export default function LoginScreen() {
 
   const handleLogin = () => {
     // Lógica real vai depois
-    router.replace('/(tabs)/Home_Index');
+    router.replace('/(tabs)/home');
   };
 
   return (
@@ -20,7 +20,7 @@ export default function LoginScreen() {
     {/* Container do logo */}
     <View style={styles.logoContainer}>
       <Image
-        source={require('../assets/images/MoneyMindLogo.png')} // ajuste o caminho se necessário
+        source={require('../../assets/images/MoneyMindLogo.png')} // ajuste o caminho se necessário
         style={styles.logo}
         resizeMode="contain"
       />

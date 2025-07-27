@@ -1,11 +1,11 @@
 import { ThemedView } from '@/components/ThemedView';
-import { Ionicons } from '@expo/vector-icons'; // Ícone de '+'
+import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { styles } from '../../styles/_Perfil_style'; // Importando o arquivo de estilos
+import styles from './_styles';
 
 export default function PerfilScreen() {
   const [imagemUri, setImagemUri] = useState<string | null>(null);
@@ -38,6 +38,7 @@ export default function PerfilScreen() {
   };
 
   const salvarEdicao = async () => {
+    if (novoNome.trim() === '') return; // evita salvar nome vazio
     setNome(novoNome);
     await AsyncStorage.setItem('nomeUsuario', novoNome);
     setEditando(false);
@@ -50,13 +51,13 @@ export default function PerfilScreen() {
           source={
             imagemUri
               ? { uri: imagemUri }
-              : require('../../assets/images/avatars/avatar1.jpg') // imagem padrão
+              : require('../../../assets/images/avatars/avatar1.jpg')
           }
           style={styles.foto}
         />
         {editando && (
           <TouchableOpacity style={styles.botaoAdicionar} onPress={escolherImagem}>
-            <Ionicons name="add" size={20} color="#fff" />
+            <Ionicons name="add" size={24} color="#fff" />
           </TouchableOpacity>
         )}
       </View>
@@ -67,13 +68,16 @@ export default function PerfilScreen() {
         <TextInput
           style={styles.input}
           placeholder="Digite seu nome"
+          placeholderTextColor="#98C1D9"
           value={novoNome}
           onChangeText={setNovoNome}
+          maxLength={30}
+          autoFocus
         />
       )}
 
       <TouchableOpacity
-        style={styles.botaoEditar}
+        style={[styles.botaoEditar, editando && styles.botaoSalvar]}
         onPress={() => {
           if (editando) {
             salvarEdicao();
@@ -85,15 +89,15 @@ export default function PerfilScreen() {
       >
         <Text style={styles.textoBotao}>{editando ? 'Salvar alterações' : 'Editar perfil'}</Text>
       </TouchableOpacity>
+
       <TouchableOpacity
-        style={[styles.botaoEditar, { backgroundColor: '#ff4d4d', marginTop: 12 }]}
+        style={styles.botaoSair}
         onPress={() => {
-          router.replace('/Login_Index');
+          router.replace('../login/index');
         }}
       >
         <Text style={styles.textoBotao}>Sair</Text>
       </TouchableOpacity>
-
     </ThemedView>
   );
 }

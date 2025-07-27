@@ -4,14 +4,6 @@ import { Dimensions, Text, View } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 
 const screenWidth = Dimensions.get('window').width - 32;
-const data = {
-  labels: ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sab', 'Dom'],
-  datasets: [
-    {
-      data: [3500, 1200, 1800, 2000, -1500, -2500, 3000]
-    }
-  ]
-};
 
 interface BarChartResumoProps {
   data: {

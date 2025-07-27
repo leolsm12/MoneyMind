@@ -1,16 +1,15 @@
-import BarChartResumoSimples from '@/components/BarChartResumoSimples';
 import FormularioFinanceiro from '@/components/FormularioFinanceiro';
 import { ThemedView } from '@/components/ThemedView';
+import { AntDesign, MaterialIcons } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { FlatList, Text, TouchableOpacity, View } from 'react-native';
-import { styles } from '../../styles/_Ganhos_style';
+import styles from './style';
 
 export default function GanhosScreen() {
   const [showModal, setShowModal] = useState(false);
   const [showMetaModal, setShowMetaModal] = useState(false);
   const [ganhos, setGanhos] = useState<{ valor: string; categoria: string; data: Date }[]>([]);
   const [metaGanhos, setMetaGanhos] = useState(5000);
-  const [novoValorMeta, setNovoValorMeta] = useState(metaGanhos.toString());
 
   const totalGanhos = ganhos.reduce((acc, item) => acc + parseFloat(item.valor), 0);
   const progresso = (totalGanhos / metaGanhos) * 100;
@@ -22,8 +21,7 @@ export default function GanhosScreen() {
         categoria: data.descricao,
         data: new Date(),
       };
-      setGanhos([...ganhos, ganho]);
-      console.log('Ganho adicionado:', ganho);
+      setGanhos([ganho, ...ganhos]); // mais recente primeiro
     }
     setShowModal(false);
   };
@@ -31,55 +29,61 @@ export default function GanhosScreen() {
   const handleSaveMeta = (dados: Record<string, string | number>) => {
     const valor = dados.meta;
     const parsedValue = typeof valor === 'string' ? parseFloat(valor) : valor;
-  
     if (!isNaN(parsedValue)) {
       setMetaGanhos(parsedValue);
-      console.log('Meta de ganhos atualizada:', parsedValue);
     }
-  
     setShowMetaModal(false);
   };
-  
 
   return (
     <ThemedView style={styles.container}>
-      <Text style={styles.title}>Total de Ganhos</Text>
-
-      <BarChartResumoSimples ganhos={totalGanhos} gastos={0} />
-
-      <View style={styles.progressoContainer}>
-        <Text style={styles.progressoText}>Meta de Ganhos</Text>
+      <View style={styles.header}>
+        <Text style={styles.title}>Ganhos Totais</Text>
         <TouchableOpacity onPress={() => setShowMetaModal(true)}>
-          <Text style={styles.metaValue}>R$ {metaGanhos}</Text>
+          <MaterialIcons name="edit" size={22} color="#FED766" />
         </TouchableOpacity>
-        <View style={styles.progressBar}>
-          <View
-            style={[
-              styles.progress,
-              { width: `${progresso}%`, backgroundColor: progresso >= 100 ? '#2ecc71' : '#f39c12' },
-            ]}
-          />
-        </View>
-        <Text style={styles.progressoText}>Progresso: {progresso.toFixed(2)}%</Text>
       </View>
 
-       {/* Lista de Ganhos Cadastrados */}     
+      <Text style={styles.totalValue}>
+        {totalGanhos.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+      </Text>
+
+      <Text style={styles.metaLabel}>Meta: {metaGanhos.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</Text>
+
+      <View style={styles.progressBar}>
+        <View
+          style={[
+            styles.progress,
+            { width: `${Math.min(progresso, 100)}%`, backgroundColor: progresso >= 100 ? '#2ecc71' : '#009FB7' },
+          ]}
+        />
+      </View>
+      <Text style={styles.progressText}>Progresso: {progresso.toFixed(1)}%</Text>
+
       <FlatList
         data={ganhos}
+        style={styles.lista}
+        ListEmptyComponent={<Text style={styles.emptyText}>Nenhum ganho registrado ainda.</Text>}
         renderItem={({ item }) => (
           <View style={styles.ganhoItem}>
-            <Text>{item.categoria} - R$ {item.valor}</Text>
-            <Text>{item.data.toLocaleDateString()} - {item.data.toLocaleTimeString()}</Text>
+            <View style={styles.itemHeader}>
+              <Text style={styles.categoria}>{item.categoria}</Text>
+              <Text style={styles.valor}>
+                {Number(item.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+              </Text>
+            </View>
+            <Text style={styles.data}>
+              {item.data.toLocaleDateString()} - {item.data.toLocaleTimeString()}
+            </Text>
           </View>
         )}
         keyExtractor={(_, index) => index.toString()}
       />
 
       <TouchableOpacity style={styles.addButton} onPress={() => setShowModal(true)}>
-        <Text style={styles.addButtonText}>+</Text>
+        <AntDesign name="pluscircle" size={50} color="#009FB7" />
       </TouchableOpacity>
 
-      {/* Formulário reutilizável */}
       <FormularioFinanceiro
         visible={showModal}
         onClose={() => setShowModal(false)}
@@ -89,19 +93,16 @@ export default function GanhosScreen() {
         campos={[
           { id: 'descricao', tipo: 'input', placeholder: 'Descrição' },
           { id: 'valor', tipo: 'input', placeholder: 'Valor (R$)' },
-        ]}   
-         />
+        ]}
+      />
 
-      {/* Modal de Meta */}
       <FormularioFinanceiro
         visible={showMetaModal}
         onClose={() => setShowMetaModal(false)}
         onSave={handleSaveMeta}
         titulo="Nova Meta de Ganhos"
         corBotao="#009FB7"
-        campos={[
-          { id: 'meta', tipo: 'input', placeholder: metaGanhos.toString() },
-        ]}
+        campos={[{ id: 'meta', tipo: 'input', placeholder: metaGanhos.toString() }]}
       />
     </ThemedView>
   );

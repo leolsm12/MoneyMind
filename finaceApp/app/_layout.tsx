@@ -25,7 +25,7 @@ export default function RootLayout() {
         {isLoggedIn ? (
           <Stack.Screen name="(tabs)" />
         ) : (
-          <Stack.Screen name="Login_Index" />
+          <Stack.Screen name="login/index" />
         )}
       </Stack>
       <StatusBar style="auto" />
