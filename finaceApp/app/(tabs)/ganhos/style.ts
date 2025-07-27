@@ -57,6 +57,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 12,
     marginVertical: 6,
+    borderLeftWidth: 5,
+    borderLeftColor: '#2ecc71',
   },
   itemHeader: {
     flexDirection: 'row',

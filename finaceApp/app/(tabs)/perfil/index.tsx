@@ -93,7 +93,7 @@ export default function PerfilScreen() {
       <TouchableOpacity
         style={styles.botaoSair}
         onPress={() => {
-          router.replace('../login/index');
+          router.replace('/login');
         }}
       >
         <Text style={styles.textoBotao}>Sair</Text>

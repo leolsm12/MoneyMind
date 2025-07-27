@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
   lista: {
     marginTop: 10,
   },
-  emptyText: {
+  emptyText: { 
     textAlign: 'center',
     color: '#EFF1F3',
     marginTop: 20,
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     padding: 12,
     marginVertical: 6,
     borderLeftWidth: 5,
-    borderLeftColor: '#f39c12', // borda laranja para destacar gasto
+    borderLeftColor: '#52f312ff', // borda laranja para destacar gasto
   },
   itemHeader: {
     flexDirection: 'row',
