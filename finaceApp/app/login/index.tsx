@@ -61,10 +61,18 @@ export default function LoginScreen() {
         </View>
 
         <TouchableOpacity
-          onPress={() => {/* lógica de recuperação de senha */}}
+          onPress={() => {router.push('/recover'); console.log('Clicou em cadastrar-se');}}
           style={styles.forgotPassword}
         >
           <Text style={styles.forgotPasswordText}>Esqueci minha senha</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{ marginTop: 20 }}
+          onPress={() => { router.push('/register'); console.log('Clicou em cadastrar-se'); }}
+        >
+          <Text style={{ color: '#FF6F00', fontWeight: '500', textAlign: 'center' }}>
+          Não tem uma conta? Cadastre-se
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -146,4 +154,3 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
 });
-
