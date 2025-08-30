@@ -1,15 +1,8 @@
-import React, { useState } from 'react';
-import {
-    ActivityIndicator,
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View
-} from 'react-native';
+import { API_URL } from '@env';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 type Step =
     | 'nome'
@@ -57,9 +50,56 @@ export default function CadastroChat() {
             setTimeout(() => {
                 setStep(nextStep(step));
                 setTyping(false);
-            }, 900);
+            }, 500);
         }
     };
+
+    useEffect(() => {
+        if (step === 'final') {
+            enviarCadastro();
+        }
+    }, [step]);
+
+    const login = async (email: string, senha: string) => {
+    try {
+        const response = await axios.post(`${API_URL}/usuarios/login`, {
+            email,
+            senha,
+        });
+
+        const token = response.data;
+        console.log('Token JWT recebido:', token);
+
+        // Salvar token localmente para usar em outros endpoints
+        await AsyncStorage.setItem('token', token);
+
+        // Redirecionar para tela Home, por exemplo
+        // navigation.navigate('Home');
+
+    } catch (error: any) {
+        console.log('Erro no login:', error.response?.data || error.message);
+    }
+};
+    
+    // função para enviar cadastro
+    const enviarCadastro = async () => {
+    try {
+        const response = await axios.post(`${API_URL}/usuarios`, {
+            nome: answers.nome,
+            email: answers.email,
+            telefone: answers.telefone,
+            senha: answers.senha,
+            salario: parseFloat(answers.salario),
+        });
+
+        console.log('Usuário criado:', response.data);
+
+        // Depois do cadastro, já fazer login automaticamente
+        await login(answers.email, answers.senha);
+    } catch (error: any) {
+        console.log('Erro ao cadastrar:', error.response?.data || error.message);
+    }
+};
 
     return (
         <KeyboardAvoidingView
