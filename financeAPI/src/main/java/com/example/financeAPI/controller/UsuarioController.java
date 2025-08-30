@@ -1,62 +1,62 @@
 package com.example.financeAPI.controller;
 
+import com.example.financeAPI.dto.LoginDTO;
+import com.example.financeAPI.dto.UsuarioDTO;
 import com.example.financeAPI.model.Usuario;
-import com.example.financeAPI.repository.UsuarioRepository;
+import com.example.financeAPI.service.UsuarioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/usuarios")
 public class UsuarioController {
 
-    private final UsuarioRepository usuarioRepository;
+    private final UsuarioService usuarioService;
 
-    public UsuarioController(UsuarioRepository usuarioRepository) {
-        this.usuarioRepository = usuarioRepository;
+    public UsuarioController(UsuarioService usuarioService) {
+        this.usuarioService = usuarioService;
     }
 
-    @GetMapping
-    public List<Usuario> listarUsuarios() {
-        return usuarioRepository.findAll();
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<Usuario> buscarUsuario(@PathVariable Long id) {
-        return usuarioRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
+    // Cadastro
     @PostMapping
-    public ResponseEntity<Usuario> criarUsuario(@RequestBody Usuario usuario) {
-        Usuario novoUsuario = usuarioRepository.save(usuario);
-        return ResponseEntity.status(HttpStatus.CREATED).body(novoUsuario);
+    public ResponseEntity<?> cadastrar(@RequestBody UsuarioDTO dto) {
+        try {
+            Usuario usuario = usuarioService.cadastrar(dto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(usuario);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
+    // Login (simplificado, JWT vem depois)
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody LoginDTO dto) {
+        var usuarioOpt = usuarioService.buscarPorEmail(dto.email());
+        if (usuarioOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email ou senha inválidos");
+        }
 
-   @PutMapping("/{id}")
-    public ResponseEntity<Usuario> atualizarUsuario(@PathVariable Long id, @RequestBody Usuario usuarioAtualizado) {
-        return usuarioRepository.findById(id)
-                .map(usuario -> {
-                    usuario.setNome(usuarioAtualizado.getNome());
-                    usuario.setEmail(usuarioAtualizado.getEmail());
-                    usuario.setSenha(usuarioAtualizado.getSenha());
-                    usuario.setDataNascimento(usuarioAtualizado.getDataNascimento());
-                    return ResponseEntity.ok(usuarioRepository.save(usuario));
-                }).orElse(ResponseEntity.notFound().build());
+        Usuario usuario = usuarioOpt.get();
+        if (!new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder()
+                .matches(dto.senha(), usuario.getSenha())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email ou senha inválidos");
+        }
+
+        // Aqui vamos gerar o JWT mais tarde
+        return ResponseEntity.ok("Login OK - token vem depois");
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deletarUsuario(@PathVariable Long id) {
-        return usuarioRepository.findById(id)
-                .map(usuario -> {
-                    usuarioRepository.delete(usuario);
-                    return ResponseEntity.noContent().build();
-                }).orElse(ResponseEntity.notFound().build());
+    // Perfil
+    @PutMapping("/{id}")
+    public ResponseEntity<?> atualizarPerfil(@PathVariable Long id, @RequestBody UsuarioDTO dto) {
+        try {
+            Usuario atualizado = usuarioService.atualizarPerfil(id, dto);
+            return ResponseEntity.ok(atualizado);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 }

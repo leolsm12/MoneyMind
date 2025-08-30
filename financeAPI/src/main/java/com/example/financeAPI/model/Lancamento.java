@@ -1,9 +1,10 @@
 package com.example.financeAPI.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
-import java.time.LocalDate;
-
+import java.time.LocalDateTime;
+@Data
 @Entity
 public class Lancamento {
 
@@ -22,58 +23,16 @@ public class Lancamento {
     private Double valor;
 
     @Column(name = "data", nullable = false)
-    private LocalDate data;
+    private LocalDateTime data;
 
     @ManyToOne
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario; // Relacionamento com o usuário
 
-    public Long getId() {
-
-        return id;
+    @PrePersist
+    protected void onCreate() {
+        this.data = LocalDateTime.from(LocalDateTime.now()); // Define automaticamente a data atual antes de salvar
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 
-    public Tipo getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(Tipo tipo) {
-        this.tipo = tipo;
-    }
-
-    public String getDescricao() {
-        return descricao;
-    }
-
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
-    }
-
-    public Double getValor() {
-        return valor;
-    }
-
-    public void setValor(Double valor) {
-        this.valor = valor;
-    }
-
-    public LocalDate getData() {
-        return data;
-    }
-
-    public void setData(LocalDate data) {
-        this.data = data;
-    }
-
-    public Usuario getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-    }
 }
