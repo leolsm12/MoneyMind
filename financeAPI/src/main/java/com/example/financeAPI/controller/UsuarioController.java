@@ -1,8 +1,10 @@
 package com.example.financeAPI.controller;
 
 import com.example.financeAPI.dto.LoginDTO;
+import com.example.financeAPI.dto.LoginResponseDTO;
 import com.example.financeAPI.dto.UsuarioDTO;
 import com.example.financeAPI.model.Usuario;
+import com.example.financeAPI.security.JwtUtil;
 import com.example.financeAPI.service.UsuarioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +17,7 @@ import java.util.List;
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
+    private final JwtUtil jwtUtil = new JwtUtil();
 
     public UsuarioController(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
@@ -45,8 +48,9 @@ public class UsuarioController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Email ou senha inválidos");
         }
 
-        // Aqui vamos gerar o JWT mais tarde
-        return ResponseEntity.ok("Login OK - token vem depois");
+
+        String token = jwtUtil.generateToken(usuario.getEmail());
+        return ResponseEntity.ok(new LoginResponseDTO(token));
     }
 
     // Perfil
@@ -58,5 +62,25 @@ public class UsuarioController {
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> me(@RequestHeader("Authorization") String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token ausente");
+        }
+
+        String token = authHeader.substring(7);
+        if (!jwtUtil.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido");
+        }
+
+        String email = jwtUtil.getEmailFromToken(token);
+        var usuarioOpt = usuarioService.buscarPorEmail(email);
+        if (usuarioOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado");
+        }
+
+        return ResponseEntity.ok(usuarioOpt.get());
     }
 }
