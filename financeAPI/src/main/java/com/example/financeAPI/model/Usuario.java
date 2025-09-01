@@ -26,4 +26,7 @@ public class Usuario {
 
     private BigDecimal salario;
 
+    private BigDecimal metaGastos = BigDecimal.ZERO;
+    private BigDecimal metaGanhos = BigDecimal.ZERO;
+
 }

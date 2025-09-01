@@ -49,4 +49,22 @@ public class UsuarioService {
 
         return usuarioRepository.save(usuario);
     }
+
+    public BigDecimal getMetaGastos(Usuario usuario) {
+        return usuario.getMetaGastos() != null ? usuario.getMetaGastos() : BigDecimal.ZERO;
+    }
+
+    public BigDecimal getMetaGanhos(Usuario usuario) {
+        return usuario.getMetaGanhos() != null ? usuario.getMetaGanhos() : BigDecimal.ZERO;
+    }
+
+    public void atualizarMetaGastos(Usuario usuario, BigDecimal valor) {
+        usuario.setMetaGastos(valor);
+        usuarioRepository.save(usuario);
+    }
+
+    public void atualizarMetaGanhos(Usuario usuario, BigDecimal valor) {
+        usuario.setMetaGanhos(valor);
+        usuarioRepository.save(usuario);
+    }
 }

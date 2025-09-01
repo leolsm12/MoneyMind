@@ -2,37 +2,30 @@ package com.example.financeAPI.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
 @Data
 @Entity
-public class Lancamento {
-
+@Table(name = "Transacao")
+public class Transacao {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "tipo_id", nullable = false)
-    private Tipo tipo; // Referência ao tipo de receita
+    @JoinColumn(name = "usuario_id")
+    private Usuario usuario;
 
-    @Column(name = "descricao", nullable = false)
+    @Column(nullable = false)
     private String descricao;
 
-    @Column(name = "valor", nullable = false)
-    private Double valor;
+    @Column(nullable = false)
+    private BigDecimal valor;
 
-    @Column(name = "data", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private TipoTransacao tipo; // GANHO ou GASTO
+
     private LocalDateTime data;
-
-    @ManyToOne
-    @JoinColumn(name = "usuario_id", nullable = false)
-    private Usuario usuario; // Relacionamento com o usuário
-
-    @PrePersist
-    protected void onCreate() {
-        this.data = LocalDateTime.from(LocalDateTime.now()); // Define automaticamente a data atual antes de salvar
-    }
-
 
 }

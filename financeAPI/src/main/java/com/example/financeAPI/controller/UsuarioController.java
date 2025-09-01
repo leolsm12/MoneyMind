@@ -8,8 +8,10 @@ import com.example.financeAPI.security.JwtUtil;
 import com.example.financeAPI.service.UsuarioService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -21,6 +23,39 @@ public class UsuarioController {
 
     public UsuarioController(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> me(@RequestHeader("Authorization") String authHeader) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token ausente");
+        }
+
+        String token = authHeader.substring(7);
+        if (!jwtUtil.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido");
+        }
+
+        String email = jwtUtil.getEmailFromToken(token);
+        var usuarioOpt = usuarioService.buscarPorEmail(email);
+        if (usuarioOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado");
+        }
+
+        return ResponseEntity.ok(usuarioOpt.get());
+    }
+
+    @GetMapping("/meta-gastos")
+    public BigDecimal getMetaGastos(Authentication authentication) {
+        Usuario usuario = (Usuario) authentication.getPrincipal();
+        return usuarioService.getMetaGastos(usuario);
+    }
+
+    // Opcional: Retorna a meta de ganhos do usuário logado
+    @GetMapping("/meta-ganhos")
+    public BigDecimal getMetaGanhos(Authentication authentication) {
+        Usuario usuario = (Usuario) authentication.getPrincipal();
+        return usuarioService.getMetaGanhos(usuario);
     }
 
     // Cadastro
@@ -64,23 +99,19 @@ public class UsuarioController {
         }
     }
 
-    @GetMapping("/me")
-    public ResponseEntity<?> me(@RequestHeader("Authorization") String authHeader) {
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token ausente");
-        }
-
-        String token = authHeader.substring(7);
-        if (!jwtUtil.validateToken(token)) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido");
-        }
-
-        String email = jwtUtil.getEmailFromToken(token);
-        var usuarioOpt = usuarioService.buscarPorEmail(email);
-        if (usuarioOpt.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado");
-        }
-
-        return ResponseEntity.ok(usuarioOpt.get());
+    @PutMapping("/meta-gastos")
+    public Usuario atualizarMetaGastos(@RequestBody BigDecimal meta, Authentication auth) {
+        Usuario usuario = (Usuario) auth.getPrincipal();
+        usuarioService.atualizarMetaGastos(usuario, meta);
+        return usuario;
     }
+
+    @PutMapping("/meta-ganhos")
+    public Usuario atualizarMetaGanhos(@RequestBody BigDecimal meta, Authentication auth) {
+        Usuario usuario = (Usuario) auth.getPrincipal();
+        usuarioService.atualizarMetaGanhos(usuario, meta);
+        return usuario;
+    }
+
+
 }

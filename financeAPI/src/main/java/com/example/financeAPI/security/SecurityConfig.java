@@ -23,16 +23,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf().disable() // desabilita CSRF
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // stateless, não armazena sessão
-                .and()
-                .authorizeHttpRequests()
-                // Rotas públicas
-                .requestMatchers("/usuarios/login", "/usuarios").permitAll()
-                // Qualquer outra rota precisa de autenticação
-                .anyRequest().authenticated()
-                .and()
-                // Adiciona o filtro JWT antes do filtro padrão de autenticação
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        // Rotas públicas
+                        .requestMatchers("/usuarios/login", "/usuarios").permitAll()
+                        .anyRequest().authenticated()
+
+                )
+                // Adiciona o filtro JWT antes do filtro padrão
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, usuarioService),
                         UsernamePasswordAuthenticationFilter.class);
 
