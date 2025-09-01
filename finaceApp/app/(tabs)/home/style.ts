@@ -20,7 +20,7 @@ const modernStyles = StyleSheet.create({
   greeting: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#FF8300',
+    color: '#3D5A80',
   },
   date: {
     fontSize: 14,
@@ -52,7 +52,7 @@ const modernStyles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 28,
     elevation: 4,
-    shadowColor: '#FF8300',
+    shadowColor: '#3D5A80',
     shadowOpacity: 0.12,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 6 },
@@ -78,7 +78,7 @@ const modernStyles = StyleSheet.create({
   },
   saldoBar: {
     height: 8,
-    backgroundColor: '#FF8300',
+    backgroundColor: '#3D5A80',
     borderRadius: 4,
   },
   row: {
@@ -95,7 +95,7 @@ const modernStyles = StyleSheet.create({
     marginHorizontal: 6,
     alignItems: 'center',
     elevation: 2,
-    shadowColor: '#FF8300',
+    shadowColor: '#3D5A80',
     shadowOpacity: 0.08,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 2 },
@@ -109,7 +109,7 @@ const modernStyles = StyleSheet.create({
   valorPositivo: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: '#FF8300',
+    color: '#3D5A80',
   },
   valorNegativo: {
     fontSize: 22,
@@ -123,7 +123,7 @@ const modernStyles = StyleSheet.create({
     padding: 18,
     marginBottom: 16,
     elevation: 2,
-    shadowColor: '#FF8300',
+    shadowColor: '#3D5A80',
     shadowOpacity: 0.08,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 2 },
@@ -131,7 +131,7 @@ const modernStyles = StyleSheet.create({
   recentTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#FF8300',
+    color: '#3D5A80',
     marginBottom: 8,
   },
   transacaoItem: {
@@ -168,10 +168,10 @@ const modernStyles = StyleSheet.create({
     letterSpacing: 1,
   },
   valorGanho: {
-    color: '#2ecc71', // verde
+    color: '#3D5A80', // verde
   },
   valorGasto: {
-    color: '#c22424ff', // vermelho
+    color: '#EE6C4D', // vermelho
   },
 });
 

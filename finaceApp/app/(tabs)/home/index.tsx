@@ -109,14 +109,14 @@ export default function HomeScreen() {
 
   if (loading || ganhos === null || gastos === null) {
     return (
-      <LinearGradient colors={['#FFF7E6', '#F7F7F7']} style={modernStyles.container}>
+      <LinearGradient colors={['#E0FBFC', '#98C1D9']} style={modernStyles.container}>
         <ActivityIndicator size="large" color="#FF8300" />
       </LinearGradient>
     );
   }
 
   return (
-    <LinearGradient colors={['#FFF7E6', '#F7F7F7']} style={modernStyles.container}>
+    <LinearGradient colors={['#E0FBFC', '#98C1D9']} style={modernStyles.container}>
       {/* Header estilo Itaú */}
       <View style={modernStyles.header}>
         <View>
@@ -142,7 +142,7 @@ export default function HomeScreen() {
         <ThemedText
           style={[
             modernStyles.saldoValor,
-            { color: saldo >= 0 ? '#FF8300' : '#EE6C4D' },
+            { color: saldo >= 0 ? '#3D5A80' : '#EE6C4D' },
           ]}
         >
           {saldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
@@ -192,10 +192,10 @@ export default function HomeScreen() {
         />
       </View>
 
-      {/* Botão de ação moderno */}
+      {/* Botão de ação moderno 
       <TouchableOpacity style={modernStyles.actionButton} activeOpacity={0.8}>
         <ThemedText style={modernStyles.actionButtonText}>Nova Transação</ThemedText>
-      </TouchableOpacity>
+      </TouchableOpacity>*/}
     </LinearGradient>
   );
 }
