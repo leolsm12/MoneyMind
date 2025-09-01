@@ -1,43 +1,111 @@
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { API_URL } from '@env';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useEffect, useState } from 'react';
-import { ActivityIndicator, Dimensions, FlatList, Image, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
+import { ActivityIndicator, FlatList, Image, TouchableOpacity, View } from 'react-native';
+import modernStyles from './style';
 
-const transacoesRecentes = [
-  { id: '1', tipo: 'Receita', valor: 500, descricao: 'Salário' },
-  { id: '2', tipo: 'Despesa', valor: -120, descricao: 'Supermercado' },
-  { id: '3', tipo: 'Despesa', valor: -80, descricao: 'Transporte' },
-];
-const { width } = Dimensions.get('window');
+type Transacao = {
+  id: string;
+  descricao: string;
+  valor: number;
+  tipo: 'GANHO' | 'GASTO';
+};
+
 
 export default function HomeScreen() {
+  const [nomeUsuario, setNomeUsuario] = useState<string | null>(null);
   const [ganhos, setGanhos] = useState<number | null>(null);
   const [gastos, setGastos] = useState<number | null>(null);
+  const [transacoesRecentes, setTransacoesRecentes] = useState<Transacao[]>([]);
   const [loading, setLoading] = useState(true);
  
 
   const saldo = ganhos !== null && gastos !== null ? ganhos - gastos : 0;
-
-  useEffect(() => {
-    const fetchDados = async () => {
+  useFocusEffect(
+    useCallback(() => {
+      const fetchDados = async () => {
       try {
-        const response = await new Promise((resolve) =>
-          setTimeout(() => {
-            resolve({ ganhos: 3000, gastos: 2500 });
-          }, 1000)
-        );
-        const { ganhos, gastos } = response as any;
-        setGanhos(ganhos);
-        setGastos(gastos);
+      const saldoData = await fetchSaldo();
+        if (saldoData) {
+          setGanhos(saldoData.ganhos);
+          setGastos(saldoData.gastos);
+        } else {
+          setGanhos(0);
+          setGastos(0);
+        }
+
+        const transacoes = await fetchTransacoesRecentes();
+        setTransacoesRecentes(transacoes);
+
+        const nome = await fetchNomeUsuario();
+        setNomeUsuario(nome);
+
       } catch (error) {
         console.error('Erro ao buscar dados:', error);
       } finally {
         setLoading(false);
       }
     };
+
     fetchDados();
-  }, []);
+  }, [])
+);
+
+  const fetchNomeUsuario = async () => {
+    const token = await AsyncStorage.getItem('token');
+    if (!token) return null;
+
+    const config = { headers: { Authorization: `Bearer ${token}` } };
+
+    try {
+      const response = await axios.get(`${API_URL}/usuarios/me`, config);
+      const nomeCompleto = response.data.nome;
+      const primeiroNome = nomeCompleto.split(' ')[0]; // pega só o primeiro nome
+      return primeiroNome;
+    } catch (error) {
+      console.error('Erro ao buscar nome do usuário:', error);
+      return null;
+    }
+  };
+
+
+  const fetchSaldo = async () => {
+    const token = await AsyncStorage.getItem('token');
+
+    const config = { headers: { Authorization: `Bearer ${token}` } };
+
+    const ganhosResponse = await axios.get(`${API_URL}/transacoes/total?tipo=GANHO`, config);
+    const gastosResponse = await axios.get(`${API_URL}/transacoes/total?tipo=GASTO`, config);
+
+    console.log('Ganhos response:', ganhosResponse.data);
+    console.log('Gastos response:', gastosResponse.data); 
+
+    return {
+      ganhos: ganhosResponse.data ?? 0,
+      gastos: gastosResponse.data ?? 0,
+      
+    };
+    
+  };
+
+  const fetchTransacoesRecentes = async () => {
+  const token = await AsyncStorage.getItem('token');
+  if (!token) return [];
+
+  const config = { headers: { Authorization: `Bearer ${token}` } };
+
+  const response = await axios.get(`${API_URL}/transacoes/recentes`, config);
+  return response.data; // array de transações
+  };
+
+
+
+
 
   if (loading || ganhos === null || gastos === null) {
     return (
@@ -52,7 +120,7 @@ export default function HomeScreen() {
       {/* Header estilo Itaú */}
       <View style={modernStyles.header}>
         <View>
-          <ThemedText style={modernStyles.greeting}>Olá, João!</ThemedText>
+          <ThemedText style={modernStyles.greeting}>Olá, {nomeUsuario ?? 'usuário'} !</ThemedText>
           <ThemedText style={modernStyles.date}>{new Date().toLocaleDateString('pt-BR')}</ThemedText>
         </View>
         <Image
@@ -107,17 +175,20 @@ export default function HomeScreen() {
         <FlatList
           data={transacoesRecentes}
           keyExtractor={item => item.id}
-          renderItem={({ item }) => (
-            <View style={modernStyles.transacaoItem}>
-              <ThemedText style={modernStyles.transacaoDescricao}>{item.descricao}</ThemedText>
-              <ThemedText style={[
-                modernStyles.transacaoValor,
-                { color: item.valor >= 0 ? '#FF8300' : '#EE6C4D' }
-              ]}>
-                {item.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-              </ThemedText>
-            </View>
-          )}
+          renderItem={({ item }) => {
+            const isGasto = item.tipo === 'GASTO';
+            const sinal = isGasto ? '-' : '+';
+            const cor = isGasto ? modernStyles.valorGasto : modernStyles.valorGanho;
+
+            return (
+              <View style={modernStyles.transacaoItem}>
+                <ThemedText style={modernStyles.transacaoDescricao}>{item.descricao}</ThemedText>
+                <ThemedText style={[modernStyles.transacaoValor, cor]}>
+                  {sinal} {Math.abs(item.valor).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                </ThemedText>
+              </View>
+            );
+          }}
         />
       </View>
 
@@ -129,170 +200,4 @@ export default function HomeScreen() {
   );
 }
 
-const modernStyles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: 48,
-    paddingHorizontal: 0,
-    paddingBottom: 35,
-    alignItems: 'center',
-  },
-  header: {
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 24,
-    marginBottom: 24,
-  },
-  greeting: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#FF8300',
-  },
-  date: {
-    fontSize: 14,
-    color: '#888',
-  },
-  logo: {
-    width: 120,
-    height: 40,
-  },
-  profileButton: {
-    backgroundColor: '#FFF',
-    borderRadius: 24,
-    padding: 8,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
-  },
-  profileIcon: {
-    width: 32,
-    height: 32,
-  },
-  mainCard: {
-    width: width * 0.92,
-    backgroundColor: '#FFF',
-    borderRadius: 20,
-    padding: 28,
-    alignItems: 'center',
-    marginBottom: 28,
-    elevation: 4,
-    shadowColor: '#FF8300',
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 },
-  },
-  saldoLabel: {
-    fontSize: 18,
-    color: '#888',
-    fontWeight: '500',
-    marginBottom: 8,
-  },
-  saldoValor: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    letterSpacing: 1
-  },
-  saldoBarContainer: {
-    width: '100%',
-    height: 8,
-    backgroundColor: '#F0F0F0',
-    borderRadius: 4,
-    marginTop: 12,
-    overflow: 'hidden',
-  },
-  saldoBar: {
-    height: 8,
-    backgroundColor: '#FF8300',
-    borderRadius: 4,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: width * 0.92,
-    marginBottom: 32,
-  },
-  infoCard: {
-    flex: 1,
-    backgroundColor: '#FFF',
-    borderRadius: 16,
-    padding: 18,
-    marginHorizontal: 6,
-    alignItems: 'center',
-    elevation: 2,
-    shadowColor: '#FF8300',
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 2 },
-  },
-  label: {
-    fontSize: 16,
-    color: '#888',
-    fontWeight: '500',
-    marginBottom: 6,
-  },
-  valorPositivo: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#FF8300',
-  },
-  valorNegativo: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    color: '#EE6C4D',
-  },
-  recentContainer: {
-    width: width * 0.92,
-    backgroundColor: '#FFF',
-    borderRadius: 16,
-    padding: 18,
-    marginBottom: 16,
-    elevation: 2,
-    shadowColor: '#FF8300',
-    shadowOpacity: 0.08,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 2 },
-  },
-  recentTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#FF8300',
-    marginBottom: 8,
-  },
-  transacaoItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 6,
-  },
-  transacaoDescricao: {
-    fontSize: 15,
-    color: '#333',
-  },
-  transacaoValor: {
-    fontSize: 15,
-    fontWeight: 'bold',
-  },
-  actionButton: {
-    width: width * 0.92,
-    backgroundColor: '#FF8300',
-    borderRadius: 16,
-    paddingVertical: 18,
-    alignItems: 'center',
-    marginTop: 'auto',
-    marginBottom: 32,
-    elevation: 3,
-    shadowColor: '#FF8300',
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-  },
-  actionButtonText: {
-    color: '#FFF',
-    fontSize: 18,
-    fontWeight: 'bold',
-    letterSpacing: 1,
-  },
-});
+

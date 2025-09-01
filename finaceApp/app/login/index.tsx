@@ -1,22 +1,51 @@
+import { API_URL } from '@env';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
-import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import styles from './style';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [senhaVisivel, setSenhaVisivel] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = () => {
-    router.replace('/(tabs)/home');
+  const handleLogin = async () => {
+    if (!email || !senha) {
+      alert('Preencha todos os campos!');
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const response = await axios.post(`${API_URL}/usuarios/login`, {
+        email,
+        senha,
+      });
+
+      console.log('Login bem-sucedido:', response.data);
+
+      // Aqui no futuro você guarda o token no AsyncStorage
+      await AsyncStorage.setItem('token', response.data.token);
+
+      router.replace('/(tabs)/home');
+    } catch (error: any) {
+      console.log('Erro ao logar:', error.response?.data || error.message);
+      alert('Email ou senha inválidos.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <LinearGradient
-      colors={['#FFD600', '#FF6F00']}
+      colors={['#98c1d9', '#293241']}
       style={styles.gradient}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
@@ -29,7 +58,7 @@ export default function LoginScreen() {
         />
 
         <View style={styles.inputContainer}>
-          <Icon name="mail" size={20} color="#FF6F00" style={styles.icon} />
+          <Icon name="mail" size={20} color="#293241" style={styles.icon} />
           <TextInput
             style={styles.input}
             placeholder="Seu e-mail"
@@ -42,14 +71,16 @@ export default function LoginScreen() {
         </View>
 
         <View style={styles.inputContainer}>
-          <Icon name="lock" size={20} color="#FF6F00" style={styles.icon} />
+          <Icon name="lock" size={20} color="#293241" style={styles.icon} />
           <TextInput
             style={styles.input}
             placeholder="Senha"
             placeholderTextColor="#999"
             value={senha}
             onChangeText={setSenha}
+            keyboardType="numeric"
             secureTextEntry={!senhaVisivel}
+            onSubmitEditing={handleLogin}
           />
           <TouchableOpacity onPress={() => setSenhaVisivel(!senhaVisivel)}>
             <Icon
@@ -86,79 +117,4 @@ export default function LoginScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  gradient: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  container: {
-    width: '90%',
-    backgroundColor: 'white',
-    borderRadius: 24,
-    padding: 32,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 16,
-    elevation: 8,
-    alignItems: 'center',
-  },
-  logo: {
-    width: 100,
-    height: 100,
-    marginBottom: 24,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F5F5F5',
-    borderRadius: 12,
-    paddingHorizontal: 12,
-    marginBottom: 16,
-    width: '100%',
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-  },
-  icon: {
-    marginRight: 8,
-  },
-  input: {
-    flex: 1,
-    height: 48,
-    fontSize: 16,
-    color: '#333',
-  },
-  forgotPassword: {
-    alignSelf: 'flex-end',
-    marginBottom: 24,
-  },
-  forgotPasswordText: {
-    color: '#FF6F00',
-    fontWeight: '500',
-  },
-  button: {
-    backgroundColor: '#FF6F00',
-    borderRadius: 16,
-    paddingVertical: 14,
-    width: '100%',
-    alignItems: 'center',
-    shadowColor: '#FF6F00',
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 18,
-  },
-  buttonRegister: {
-    marginTop: 20,
-  },
-  buttonRegisterText: {
-    color: '#FF6F00',
-    fontWeight: '500',
-    textAlign: 'center'
-  }
-});
+

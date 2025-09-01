@@ -1,21 +1,26 @@
 import FormularioFinanceiro from '@/components/FormularioFinanceiro';
 import { ThemedView } from '@/components/ThemedView';
+import { API_URL } from '@env';
 import { AntDesign, Feather, MaterialIcons } from '@expo/vector-icons';
-import React, { useEffect, useRef, useState } from 'react';
-import { Alert, Animated, Dimensions, FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { useFocusEffect } from 'expo-router';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Alert, Animated, FlatList, Text, TouchableOpacity, View } from 'react-native';
+import styles from './style';
 
-const { width } = Dimensions.get('window');
+
 
 export default function GanhosScreen() {
   const [showModal, setShowModal] = useState(false);
   const [showMetaModal, setShowMetaModal] = useState(false);
   const [ganhos, setGanhos] = useState<{ valor: string; categoria: string; data: Date }[]>([]);
-  const [metaGanhos, setMetaGanhos] = useState(5000);
+  const [metaGanhos, setMetaGanhos] = useState<number>(0);
 
   // Animação do progresso
   const progressoAnim = useRef(new Animated.Value(0)).current;
   const totalGanhos = ganhos.reduce((acc, item) => acc + parseFloat(item.valor), 0);
-  const progresso = (totalGanhos / metaGanhos) * 100;
+  const progresso = metaGanhos > 0 ? (totalGanhos / metaGanhos) * 100 : 0;
 
   useEffect(() => {
     Animated.timing(progressoAnim, {
@@ -25,12 +30,40 @@ export default function GanhosScreen() {
     }).start();
   }, [progresso]);
 
+  useFocusEffect(
+    useCallback(() => {
+      const fetchGanhos = async () => {
+        const token = await AsyncStorage.getItem('token');
+        if (!token) return;
+
+        const config = { headers: { Authorization: `Bearer ${token}` } };
+
+        try {
+          const response = await axios.get(`${API_URL}/transacoes/todas?tipo=GANHO`, config);
+          const dados = response.data.map((item: any) => ({
+            id: item.id,
+            valor: item.valor.toString(),
+            categoria: item.descricao,
+            data: new Date(item.data),
+          }));
+          console.log(dados);
+          setGanhos(dados);
+        } catch (error) {
+          console.error('Erro ao buscar gastos:', error);
+        }
+      };
+
+      fetchGanhos();
+      fetchMetaGanhos();
+    }, [])
+  );
+
   const formatarParaBRL = (valor: number | string) => {
     const numero = typeof valor === 'string' ? parseFloat(valor) : valor;
     return numero.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   };
 
-  const handleSaveGanho = (data: Record<string, any>) => {
+  const handleSaveGanho = async (data: Record<string, any>) => {
     const { descricao, valor } = data;
     const valorNumerico = parseFloat(valor);
 
@@ -39,44 +72,134 @@ export default function GanhosScreen() {
       return;
     }
 
+    const token = await AsyncStorage.getItem('token');
+    if (!token) return;
+
+    const config = { headers: { Authorization: `Bearer ${token}` } };
+
     const novoGanho = {
-      valor: valorNumerico.toString(),
-      categoria: descricao,
-      data: new Date(),
+      descricao,
+      valor: valorNumerico,
+      tipo: 'GANHO',
+      data: new Date().toISOString(),
     };
 
-    setGanhos(prev => [novoGanho, ...prev]);
-    setShowModal(false);
+    try {
+      await axios.post(`${API_URL}/transacoes`, novoGanho, config);
+      setGanhos(prev => [
+        {
+          valor: valorNumerico.toString(),
+          categoria: descricao,
+          data: new Date(),
+        },
+        ...prev,
+      ]);
+      setShowModal(false);
+    } catch (error) {
+      console.error('Erro ao salvar ganho:', error);
+      Alert.alert('Erro', 'Não foi possível salvar o ganho.');
+    }
   };
 
-  const handleSaveMeta = (dados: Record<string, string | number>) => {
+  const fetchMetaGanhos = async () => {
+  try {
+    const token = await AsyncStorage.getItem('token');
+    if (!token) {
+      console.error('Token não encontrado');
+      return;
+    }
+
+    const response = await axios.get(`${API_URL}/usuarios/meta-ganhos`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    // Assume que o backend retorna um número ou string representando o valor
+    const meta = typeof response.data === 'string' ? parseFloat(response.data) : response.data;
+    
+    if (!isNaN(meta)) {
+      setMetaGanhos(meta);
+    } else {
+      setMetaGanhos(0);
+    }
+  } catch (error) {
+    console.error('Erro ao carregar meta de ganhos:', error);
+    setMetaGanhos(0);
+  }
+};
+
+  const handleSaveMeta = async (dados: Record<string, string | number>) => {
     const valor = dados.meta;
     const parsedValue = typeof valor === 'string' ? parseFloat(valor) : valor;
 
-    if (!isNaN(parsedValue) && parsedValue > 0) {
-      setMetaGanhos(parsedValue);
-    } else {
-      Alert.alert('Erro', 'Informe um valor de meta válido e maior que zero.');
-    }
-    setShowMetaModal(false);
-  };
+    if (isNaN(parsedValue) || parsedValue < 0) {
+    Alert.alert('Erro', 'Informe um valor de meta válido e maior ou igual a que zero.');
+    return;
+  }
 
-  const handleDeleteGanho = (index: number) => {
-    Alert.alert(
-      'Remover ganho',
-      'Tem certeza que deseja remover este ganho?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Remover',
-          style: 'destructive',
-          onPress: () => {
-            setGanhos(prev => prev.filter((_, i) => i !== index));
-          },
+  try {
+    const token = await AsyncStorage.getItem('token');
+    if (!token) {
+      Alert.alert('Erro', 'Usuário não autenticado.');
+      return;
+    }
+
+    // Chamada PUT para atualizar a meta de ganhos
+    await axios.put(
+      `${API_URL}/usuarios/meta-ganhos`,
+      parsedValue, // envia o valor no body
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-      ]
+      }
     );
-  };
+
+    // Atualiza o estado local
+    setMetaGanhos(parsedValue);
+    setShowMetaModal(false);
+    Alert.alert('Sucesso', 'Meta de gastos atualizada com sucesso!');
+    console.error('atualizar meta:');
+  } catch (error) {
+    console.error('Erro ao atualizar meta:', error);
+    Alert.alert('Erro', 'Não foi possível atualizar a meta.');
+  }
+};
+
+  const handleDeleteGanho = async (id: number, index: number) => {
+  Alert.alert(
+    'Remover ganho',
+    'Tem certeza que deseja remover este ganho?',
+    [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Remover',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            const token = await AsyncStorage.getItem('token');
+            if (!token) {
+              console.error('Token não encontrado');
+              return;
+            }
+
+            // Chamada DELETE para o backend
+            await axios.delete(`${API_URL}/transacoes/${id}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+
+            // Atualiza o estado local
+            setGanhos(prev => prev.filter((_, i) => i !== index));
+            console.log('Gasto deletado com sucesso');
+          } catch (error) {
+            console.error('Erro ao deletar gasto:', error);
+            Alert.alert('Erro', 'Não foi possível deletar o gasto.');
+          }
+        },
+      },
+    ]
+  );
+};
 
   // Ícone por categoria (exemplo simples)
   const getCategoriaIcon = (categoria: string) => {
@@ -143,7 +266,7 @@ export default function GanhosScreen() {
               </View>
               <Text style={styles.valor}>{formatarParaBRL(item.valor)}</Text>
               <TouchableOpacity
-                onPress={() => handleDeleteGanho(index)}
+                onPress={() => handleDeleteGanho(item.id, index)}
                 accessibilityLabel="Remover ganho"
                 style={{ marginLeft: 8 }}
               >
@@ -190,126 +313,4 @@ export default function GanhosScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    paddingHorizontal: 16,
-    paddingTop: 32,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#222',
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    marginTop: 4,
-  },
-  card: {
-    backgroundColor: '#FFF5E6',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 24,
-    shadowColor: '#FF8200',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  cardLabel: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 4,
-  },
-  cardValue: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#222',
-    marginBottom: 4,
-  },
-  cardMeta: {
-    fontSize: 16,
-    color: '#FF8200',
-    marginBottom: 12,
-  },
-  progressBar: {
-    height: 16,
-    backgroundColor: '#FFE0B2',
-    borderRadius: 8,
-    overflow: 'hidden',
-    marginBottom: 8,
-    width: '100%',
-  },
-  progress: {
-    height: 16,
-    borderRadius: 8,
-  },
-  progressText: {
-    fontSize: 14,
-    color: '#222',
-    marginBottom: 4,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#222',
-    marginBottom: 12,
-    marginTop: 8,
-  },
-  lista: {
-    marginBottom: 24,
-  },
-  emptyText: {
-    fontSize: 16,
-    color: '#999',
-    textAlign: 'center',
-    marginVertical: 24,
-  },
-  ganhoItem: {
-    backgroundColor: '#FFF',
-    borderRadius: 12,
-    padding: 12,
-    shadowColor: '#FF8200',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.07,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  itemHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 4,
-  },
-  categoria: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#222',
-    marginLeft: 8,
-  },
-  valor: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#222',
-    marginLeft: 8,
-  },
-  data: {
-    fontSize: 12,
-    color: '#888',
-    marginTop: 2,
-  },
-  addButton: {
-    position: 'absolute',
-    right: 24,
-    bottom: 65,
-    zIndex: 10,
-  },
-});
+

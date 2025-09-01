@@ -1,38 +1,39 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { useState } from 'react';
-import 'react-native-reanimated';
-
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 
 export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Mude isso para true para testar o fluxo com tabs
+  const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
+  useEffect(() => {
+    const checkToken = async () => {
+      try {
+        await AsyncStorage.clear();
+        const token = await AsyncStorage.getItem('token');
+        setIsLoggedIn(!!token);
+      } catch (err) {
+        setIsLoggedIn(false);
+      }
+    };
+    checkToken();
+  }, []);
 
-  if (!loaded) {
-    return null;
+  if (isLoggedIn === null) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#FF6F00" />
+      </View>
+    );
   }
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack screenOptions={{ headerShown: false }}>
-        {isLoggedIn ? (
-          <Stack.Screen name="(tabs)" />
-        ) : (
-          <>
-            <Stack.Screen name="login/index" />
-            <Stack.Screen name="register/index" />
-            <Stack.Screen name="recover/index" />
-          </>
-        )}
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <Stack screenOptions={{ headerShown: false }}>
+      {isLoggedIn ? (
+        <Stack.Screen name="(tabs)" />
+      ) : (
+        <Stack.Screen name="login/index" />
+      )}
+    </Stack>
   );
 }

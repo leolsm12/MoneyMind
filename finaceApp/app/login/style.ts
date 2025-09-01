@@ -1,72 +1,79 @@
 import { StyleSheet } from 'react-native';
 
 const styles = StyleSheet.create({
-  container: {
+  gradient: {
     flex: 1,
-    backgroundColor: '#E0FBFC', // Fundo suave
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    paddingTop: 60,
-  },
-
-  logoContainer: {
-    marginBottom: 10,
+    justifyContent: 'center',
     alignItems: 'center',
   },
-
-  logo: {
-    width: 350,
-    height: 350,
-  },
-
-  formContainer: {
+  container: {
     width: '90%',
+    backgroundColor: 'white',
+    borderRadius: 24,
+    padding: 32,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 16,
+    elevation: 8,
+    alignItems: 'center',
   },
-
-  input: {
-    height: 48,
-    borderColor: '#98C1D9', // Borda azul clara
-    borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 12,
-    marginBottom: 16,
-    backgroundColor: '#fff',
-    color: '#293241',
+  logo: {
+    width: 100,
+    height: 100,
+    marginBottom: 24,
   },
-
-  senhaContainer: {
+  inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderColor: '#98C1D9',
-    borderWidth: 1,
-    borderRadius: 8,
+    backgroundColor: '#F5F5F5',
+    borderRadius: 12,
     paddingHorizontal: 12,
     marginBottom: 16,
-    backgroundColor: '#fff',
+    width: '100%',
+    shadowColor: '#000',
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
   },
-
-  inputSenha: {
+  icon: {
+    marginRight: 8,
+  },
+  input: {
     flex: 1,
     height: 48,
-    color: '#293241',
+    fontSize: 16,
+    color: '#333',
   },
-
-  botao: {
-    backgroundColor: '#EE6C4D', // Coral de destaque
-    paddingVertical: 12,
-    borderRadius: 8,
+  forgotPassword: {
+    alignSelf: 'flex-end',
+    marginBottom: 24,
+  },
+  forgotPasswordText: {
+    color: '#293241',
+    fontWeight: '500',
+  },
+  button: {
+    backgroundColor: '#293241',
+    borderRadius: 16,
+    paddingVertical: 14,
+    width: '100%',
     alignItems: 'center',
-    shadowColor: '#3D5A80',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
+    shadowColor: '#293241',
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
     elevation: 4,
   },
-
-  textoBotao: {
+  buttonText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 18,
   },
+  buttonRegister: {
+    marginTop: 20,
+  },
+  buttonRegisterText: {
+    color: '#293241',
+    fontWeight: '500',
+    textAlign: 'center'
+  }
 });
 export default styles;

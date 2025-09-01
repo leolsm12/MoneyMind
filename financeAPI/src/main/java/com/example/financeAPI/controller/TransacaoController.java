@@ -1,9 +1,9 @@
 package com.example.financeAPI.controller;
 
-import com.example.financeAPI.model.Lancamento;
+import com.example.financeAPI.model.Transacao;
 import com.example.financeAPI.model.Tipo;
 import com.example.financeAPI.model.Usuario;
-import com.example.financeAPI.repository.LancamentoRepository;
+import com.example.financeAPI.repository.TransacaoRepository;
 import com.example.financeAPI.repository.TipoRepository;
 import com.example.financeAPI.repository.UsuarioRepository;
 import org.springframework.http.ResponseEntity;
@@ -15,25 +15,25 @@ import java.util.Optional;
 @RequestMapping("/lancamentos")
 public class LancamentoController {
 
-    private final LancamentoRepository lancamentoRepository;
+    private final TransacaoRepository lancamentoRepository;
     private final UsuarioRepository usuarioRepository;
     private final TipoRepository tipoRepository;
 
-    public LancamentoController(LancamentoRepository lancamentoRepository, UsuarioRepository usuarioRepository, TipoRepository tipoRepository) {
+    public LancamentoController(TransacaoRepository lancamentoRepository, UsuarioRepository usuarioRepository, TipoRepository tipoRepository) {
         this.lancamentoRepository = lancamentoRepository;
         this.usuarioRepository = usuarioRepository;
         this.tipoRepository = tipoRepository;
     }
 
     @GetMapping("/{usuarioId}")
-    public ResponseEntity<List<Lancamento>> listarReceitas(@PathVariable Long usuarioId) {
+    public ResponseEntity<List<Transacao>> listarReceitas(@PathVariable Long usuarioId) {
         Optional<Usuario> usuario = usuarioRepository.findById(usuarioId);
         return usuario.map(value -> ResponseEntity.ok(lancamentoRepository.findByUsuario(value)))
                 .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Lancamento criarLancamento(@RequestBody Lancamento lancamento) {
+    public Transacao criarLancamento(@RequestBody Transacao lancamento) {
         // Buscar o usuário pelo ID
         Usuario usuario = usuarioRepository.findById(lancamento.getUsuario().getId())
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));

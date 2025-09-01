@@ -1,14 +1,19 @@
 import { ThemedView } from '@/components/ThemedView';
+import { API_URL } from '@env';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 import * as ImagePicker from 'expo-image-picker';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Image, ScrollView, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import styles from './_styles';
+
 
 export default function PerfilScreen() {
   const [imagemUri, setImagemUri] = useState<string | null>(null);
   const [editando, setEditando] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [nome, setNome] = useState('');
   const [novoNome, setNovoNome] = useState('');
   const [email, setEmail] = useState('');
@@ -17,18 +22,36 @@ export default function PerfilScreen() {
   const [novoTelefone, setNovoTelefone] = useState('');
 
   useEffect(() => {
-    (async () => {
-      const uriSalva = await AsyncStorage.getItem('fotoPerfil');
-      const nomeSalvo = await AsyncStorage.getItem('nomeUsuario');
-      const emailSalvo = await AsyncStorage.getItem('emailUsuario');
-      const telefoneSalvo = await AsyncStorage.getItem('telefoneUsuario');
-      if (uriSalva) setImagemUri(uriSalva);
-      if (nomeSalvo) setNome(nomeSalvo);
-      if (emailSalvo) setEmail(emailSalvo);
-      if (telefoneSalvo) setTelefone(telefoneSalvo);
-    })();
-  }, []);
+    const buscarUsuario = async () => {
+    const token = await AsyncStorage.getItem('token');
+    console.log('Token:', token);
+    if (!token) return;
 
+    try {
+      const response = await axios.get(`${API_URL}/usuarios/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const usuario = response.data;
+      setNome(usuario.nome || '');
+      setNovoNome(usuario.nome || '');
+      setEmail(usuario.email || '');
+      setNovoEmail(usuario.email || '');
+      setTelefone(usuario.telefone || '');
+      setNovoTelefone(usuario.telefone || '');
+
+      const uriSalva = await AsyncStorage.getItem('fotoPerfil');
+      if (uriSalva) setImagemUri(uriSalva);
+    } catch (error) {
+      console.log('Erro ao buscar usuário:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  buscarUsuario();
+}, []);
+
+  // 🔹 Escolher nova imagem
   const escolherImagem = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -44,26 +67,48 @@ export default function PerfilScreen() {
     }
   };
 
+  // 🔹 Salvar edição no backend
   const salvarEdicao = async () => {
-    if (novoNome.trim() === '') return;
-    setNome(novoNome);
-    await AsyncStorage.setItem('nomeUsuario', novoNome);
+    const token = await AsyncStorage.getItem('token');
+    if (!token) return;
 
-    setEmail(novoEmail);
-    await AsyncStorage.setItem('emailUsuario', novoEmail);
+    try {
+      const response = await axios.put(
+        `${API_URL}/usuarios/me`,
+        {
+          nome: novoNome,
+          email: novoEmail,
+          telefone: novoTelefone,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-    setTelefone(novoTelefone);
-    await AsyncStorage.setItem('telefoneUsuario', novoTelefone);
+      const usuarioAtualizado = response.data;
+      setNome(usuarioAtualizado.nome);
+      setEmail(usuarioAtualizado.email);
+      setTelefone(usuarioAtualizado.telefone);
 
-    setEditando(false);
+      setEditando(false);
+    } catch (error) {
+      console.log('Erro ao atualizar usuário:', error);
+    }
   };
+
+  if (loading) {
+    return null;
+  }
+
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem('token');
+    router.replace('/login');
+}
 
   return (
     <ThemedView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.header}>
           <Text style={styles.titulo}>Perfil</Text>
-          <TouchableOpacity onPress={() => router.replace('/login')}>
+          <TouchableOpacity onPress={handleLogout}>
             <MaterialIcons name="logout" size={28} color="#fff" />
           </TouchableOpacity>
         </View>
@@ -165,126 +210,4 @@ export default function PerfilScreen() {
   );
 }
 
-import { StyleSheet } from 'react-native';
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F5F6FA',
-  },
-  scrollContent: {
-    padding: 24,
-    paddingBottom: 40,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#FF6F00',
-    padding: 16,
-    borderRadius: 16,
-    marginTop: 15,
-    marginBottom: 25,
-  },
-  titulo: {
-    color: '#fff',
-    fontSize: 22,
-    fontWeight: 'bold',
-    letterSpacing: 1,
-  },
-  fotoContainer: {
-    alignItems: 'center',
-    marginBottom: 16,
-    position: 'relative',
-  },
-  foto: {
-    width: 110,
-    height: 110,
-    borderRadius: 55,
-    borderWidth: 3,
-    borderColor: '#FF6F00',
-    backgroundColor: '#fff',
-  },
-  botaoAdicionar: {
-    position: 'absolute',
-    right: 10,
-    bottom: 10,
-    backgroundColor: '#FF6F00',
-    borderRadius: 20,
-    padding: 6,
-    elevation: 2,
-  },
-  infoContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 24,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  nome: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#222',
-    marginBottom: 12,
-    textAlign: 'center',
-  },
-  infoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-    gap: 8,
-  },
-  infoText: {
-    fontSize: 16,
-    color: '#444',
-  },
-  input: {
-    backgroundColor: '#F0F4F8',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    marginBottom: 10,
-    borderWidth: 1,
-    borderColor: '#D9E6F2',
-    color: '#222',
-  },
-  botaoEditar: {
-    backgroundColor: '#FF6F00',
-    borderRadius: 8,
-    paddingVertical: 12,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  botaoSalvar: {
-    backgroundColor: '#009EE2',
-  },
-  textoBotao: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 16,
-  },
-  extraContainer: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 16,
-    gap: 12,
-    shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  extraItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingVertical: 8,
-  },
-  extraText: {
-    fontSize: 16,
-    color: '#FF6F00',
-    fontWeight: '500',
-  },
-});
