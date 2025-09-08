@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/transacoes")
@@ -27,6 +28,35 @@ public class TransacaoController {
     public Transacao criarTransacao(@RequestBody TransacaoDTO dto, Authentication authentication) {
         Usuario usuario = (Usuario) authentication.getPrincipal();
         return transacaoService.salvarTransacao(usuario.getId(), dto.getDescricao(), dto.getValor(), dto.getTipo());
+    }
+
+    @GetMapping("/mensal")
+    public Map<String, Object> transacoesMensais(
+            Authentication authentication,
+            @RequestParam int ano,
+            @RequestParam int mes
+    ) {
+        Usuario usuario = (Usuario) authentication.getPrincipal();
+
+        List<Transacao> transacoes = transacaoService.buscarPorMes(usuario.getId(), ano, mes);
+
+        BigDecimal ganhos = transacoes.stream()
+                .filter(t -> t.getTipo().name().equals("GANHO"))
+                .map(Transacao::getValor)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal gastos = transacoes.stream()
+                .filter(t -> t.getTipo().name().equals("GASTO"))
+                .map(Transacao::getValor)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return Map.of(
+                "mes", String.format("%02d/%d", mes, ano),
+                "ganhos", ganhos,
+                "gastos", gastos,
+                "saldo", ganhos.subtract(gastos),
+                "transacoes", transacoes
+        );
     }
 
     /**

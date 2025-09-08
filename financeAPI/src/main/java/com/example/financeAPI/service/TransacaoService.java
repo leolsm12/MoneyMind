@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.List;
 
 @Service
@@ -69,4 +71,13 @@ public class TransacaoService {
     public void deletarTransacao(Long id) {
         transacaoRepository.deleteById(id);
     }
+
+    public List<Transacao> buscarPorMes(Long usuarioId, int ano, int mes) {
+        return transacaoRepository.findByUsuarioIdAndDataBetween(
+                usuarioId,
+                LocalDate.of(ano, mes, 1).atStartOfDay(),
+                LocalDate.of(ano, mes, YearMonth.of(ano, mes).lengthOfMonth()).atTime(23,59,59)
+        );
+    }
+
 }
