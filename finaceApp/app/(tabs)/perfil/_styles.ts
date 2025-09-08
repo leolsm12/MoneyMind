@@ -13,7 +13,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#FF6F00',
+    backgroundColor: '#3D5A80',
     padding: 16,
     borderRadius: 16,
     marginTop: 15,
@@ -35,14 +35,14 @@ const styles = StyleSheet.create({
     height: 110,
     borderRadius: 55,
     borderWidth: 3,
-    borderColor: '#FF6F00',
+    borderColor: '#3D5A80',
     backgroundColor: '#fff',
   },
   botaoAdicionar: {
     position: 'absolute',
     right: 10,
     bottom: 10,
-    backgroundColor: '#FF6F00',
+    backgroundColor: '#3D5A80',
     borderRadius: 20,
     padding: 6,
     elevation: 2,
@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
     color: '#222',
   },
   botaoEditar: {
-    backgroundColor: '#FF6F00',
+    backgroundColor: '#3D5A80',
     borderRadius: 8,
     paddingVertical: 12,
     alignItems: 'center',
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   },
   extraText: {
     fontSize: 16,
-    color: '#FF6F00',
+    color: '#3D5A80',
     fontWeight: '500',
   },
    center: {

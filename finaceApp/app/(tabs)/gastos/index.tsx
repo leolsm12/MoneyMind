@@ -201,10 +201,10 @@ export default function GastosScreen() {
 };
 
   const getCategoriaIcon = (categoria: string) => {
-    if (/supermercado|mercado/i.test(categoria)) return <Feather name="shopping-cart" size={24} color="#FF8300" />;
-    if (/transporte|uber|ônibus/i.test(categoria)) return <Feather name="truck" size={24} color="#FF8300" />;
-    if (/lazer|cinema|bar/i.test(categoria)) return <Feather name="smile" size={24} color="#FF8300" />;
-    return <Feather name="tag" size={24} color="#FF8300" />;
+    if (/supermercado|mercado/i.test(categoria)) return <Feather name="shopping-cart" size={24} color="#3D5A80" />;
+    if (/transporte|uber|ônibus/i.test(categoria)) return <Feather name="truck" size={24} color="#3D5A80" />;
+    if (/lazer|cinema|bar/i.test(categoria)) return <Feather name="smile" size={24} color="#3D5A80" />;
+    return <Feather name="tag" size={24} color="#3D5A80" />;
   };
 
   return (
@@ -215,7 +215,7 @@ export default function GastosScreen() {
           <Text style={styles.subtitle}>Acompanhe seu mês</Text>
         </View>
         <TouchableOpacity onPress={() => setShowMetaModal(true)} accessibilityLabel="Editar meta de gastos">
-          <MaterialIcons name="edit" size={28} color="#FF8300" />
+          <MaterialIcons name="edit" size={28} color="#3D5A80" />
         </TouchableOpacity>
       </View>
 
@@ -232,7 +232,7 @@ export default function GastosScreen() {
                   inputRange: [0, 100],
                   outputRange: ['0%', '100%'],
                 }),
-                backgroundColor: progresso >= 100 ? '#E60000' : '#FF8300',
+                backgroundColor: progresso >= 100 ? '#E60000' : '#3D5A80',
               },
             ]}
           />
@@ -267,7 +267,7 @@ export default function GastosScreen() {
                 accessibilityLabel="Remover gasto"
                 style={{ marginLeft: 8 }}
               >
-                <AntDesign name="delete" size={22} color="#E60000" />
+                <AntDesign name="delete" size={22} color="#888" />
               </TouchableOpacity>
             </View>
             <Text style={styles.data}>
@@ -283,7 +283,7 @@ export default function GastosScreen() {
         onPress={() => setShowModal(true)}
         accessibilityLabel="Adicionar novo gasto"
       >
-        <AntDesign name="pluscircle" size={60} color="#FF8300" />
+        <AntDesign name="pluscircle" size={60} color="#EE6C4D" />
       </TouchableOpacity>
 
       <FormularioFinanceiro
@@ -291,7 +291,7 @@ export default function GastosScreen() {
         onClose={() => setShowModal(false)}
         onSave={handleSaveGasto}
         titulo="Registrar novo gasto"
-        corBotao="#FF8300"
+        corBotao="#EE6C4D"
         campos={[
           { id: 'descricao', tipo: 'input', placeholder: 'Descrição' },
           { id: 'valor', tipo: 'input', placeholder: 'Valor (R$)' },
@@ -303,7 +303,7 @@ export default function GastosScreen() {
         onClose={() => setShowMetaModal(false)}
         onSave={handleSaveMeta}
         titulo="Nova Meta de Gastos"
-        corBotao="#FF8300"
+        corBotao="#EE6C4D"
         campos={[{ id: 'meta', tipo: 'input', placeholder: metaGastos.toString() }]}
       />
     </ThemedView>

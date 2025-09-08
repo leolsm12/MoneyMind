@@ -36,7 +36,7 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
               <Ionicons
                 name={iconData.name as any}
                 size={22}
-                color={isFocused ? '#FF8300' : '#A0A4A8'}
+                color={isFocused ? '#3D5A80' : '#A0A4A8'}
               />
              
             </View>
@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
     width: 16,
     height: 3,
     borderRadius: 2,
-    backgroundColor: '#FF8300',
+    backgroundColor: '#3D5A80',
   },
   label: {
     fontSize: 11,
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     marginTop: -2,
   },
   labelActive: {
-    color: '#FF8300',
+    color: '#3D5A80',
     fontWeight: 'bold',
   },
-});
+}); 

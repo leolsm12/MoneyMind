@@ -203,10 +203,10 @@ export default function GanhosScreen() {
 
   // Ícone por categoria (exemplo simples)
   const getCategoriaIcon = (categoria: string) => {
-    if (/salário|emprego/i.test(categoria)) return <Feather name="dollar-sign" size={24} color="#FF8200" />;
-    if (/freelance|autônomo/i.test(categoria)) return <Feather name="briefcase" size={24} color="#FF8200" />;
-    if (/outros|extra/i.test(categoria)) return <Feather name="plus" size={24} color="#FF8200" />;
-    return <Feather name="star" size={24} color="#FF8200" />;
+    if (/salário|emprego|salario/i.test(categoria)) return <Feather name="dollar-sign" size={24} color="#3D5A80" />;
+    if (/freelance|autônomo/i.test(categoria)) return <Feather name="briefcase" size={24} color="#3D5A80" />;
+    if (/outros|extra/i.test(categoria)) return <Feather name="plus" size={24} color="#3D5A80" />;
+    return <Feather name="star" size={24} color="#3D5A80" />;
   };
 
   return (
@@ -220,7 +220,7 @@ export default function GanhosScreen() {
           onPress={() => setShowMetaModal(true)}
           accessibilityLabel="Editar meta de ganhos"
         >
-          <MaterialIcons name="edit" size={28} color="#FF8200" />
+          <MaterialIcons name="edit" size={28} color="#3D5A80" />
         </TouchableOpacity>
       </View>
 
@@ -237,7 +237,7 @@ export default function GanhosScreen() {
                   inputRange: [0, 100],
                   outputRange: ['0%', '100%'],
                 }),
-                backgroundColor: progresso >= 100 ? '#2ecc71' : '#FF8200',
+                backgroundColor: progresso >= 100 ? '#2ecc71' : '#3D5A80',
               },
             ]}
           />
@@ -286,7 +286,7 @@ export default function GanhosScreen() {
         onPress={() => setShowModal(true)}
         accessibilityLabel="Adicionar novo ganho"
       >
-        <AntDesign name="pluscircle" size={60} color="#FF8200" />
+        <AntDesign name="pluscircle" size={60} color="#EE6C4D" />
       </TouchableOpacity>
 
       <FormularioFinanceiro
@@ -294,7 +294,7 @@ export default function GanhosScreen() {
         onClose={() => setShowModal(false)}
         onSave={handleSaveGanho}
         titulo="Registrar novo ganho"
-        corBotao="#FF8200"
+        corBotao="#EE6C4D"
         campos={[
           { id: 'descricao', tipo: 'input', placeholder: 'Descrição' },
           { id: 'valor', tipo: 'input', placeholder: 'Valor (R$)' },
@@ -306,7 +306,7 @@ export default function GanhosScreen() {
         onClose={() => setShowMetaModal(false)}
         onSave={handleSaveMeta}
         titulo="Nova Meta de Ganhos"
-        corBotao="#FF8200"
+        corBotao="#EE6C4D"
         campos={[{ id: 'meta', tipo: 'input', placeholder: metaGanhos.toString() }]}
       />
     </ThemedView>

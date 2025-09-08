@@ -134,11 +134,11 @@ export default function PerfilScreen() {
             <>
               <Text style={styles.nome}>{nome || 'Usuário sem nome'}</Text>
               <View style={styles.infoRow}>
-                <MaterialIcons name="email" size={20} color="#FF6F00" />
+                <MaterialIcons name="email" size={20} color="#3D5A80" />
                 <Text style={styles.infoText}>{email || 'Email não informado'}</Text>
               </View>
               <View style={styles.infoRow}>
-                <MaterialIcons name="phone" size={20} color="#FF6F00" />
+                <MaterialIcons name="phone" size={20} color="#3D5A80" />
                 <Text style={styles.infoText}>{telefone || 'Telefone não informado'}</Text>
               </View>
             </>
@@ -193,15 +193,15 @@ export default function PerfilScreen() {
 
         <View style={styles.extraContainer}>
           <TouchableOpacity style={styles.extraItem}>
-            <Ionicons name="lock-closed" size={22} color="#FF6F00" />
+            <Ionicons name="lock-closed" size={22} color="#3D5A80" />
             <Text style={styles.extraText}>Alterar senha</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.extraItem}>
-            <Ionicons name="help-circle" size={22} color="#FF6F00" />
+            <Ionicons name="help-circle" size={22} color="#3D5A80" />
             <Text style={styles.extraText}>Ajuda</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.extraItem}>
-            <Ionicons name="settings" size={22} color="#FF6F00" />
+            <Ionicons name="settings" size={22} color="#3D5A80" />
             <Text style={styles.extraText}>Configurações</Text>
           </TouchableOpacity>
         </View>

@@ -63,16 +63,26 @@ export default function CadastroChat() {
         scrollRef.current?.scrollToEnd({ animated: true });
       }, 500);
     }
+    console.log(scrollRef);
   };
 
   useEffect(() => {
-    if (step === 'final') enviarCadastro();
+    if (step !== 'final') {
+    const timer = setTimeout(() => {
+      inputRef.current?.focus(); // foca automaticamente no novo campo
+      scrollRef.current?.scrollToEnd({ animated: true });
+    }, 100); // pequeno delay para garantir que o TextInput já foi renderizado
+    return () => clearTimeout(timer);
+  }else{
+    // envia o cadastro quando chegar no passo final
+    enviarCadastro();
+  }
   }, [step]);
 
   const login = async (email: string, senha: string) => {
     try {
       const response = await axios.post(`${API_URL}/usuarios/login`, { email, senha });
-      const token = response.data;
+      const token = response.data.token;
       await AsyncStorage.setItem('token', token);
       return token;
     } catch (error: any) {
@@ -109,7 +119,7 @@ export default function CadastroChat() {
         contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', paddingVertical: 40, paddingHorizontal: 16 }}
         enableOnAndroid={true}
         keyboardOpeningTime={0}
-        extraScrollHeight={Platform.OS === 'ios' ? 20 : 80}
+        extraScrollHeight={ 20 }
         keyboardShouldPersistTaps="handled"
         enableAutomaticScroll={true}
       >
@@ -151,7 +161,7 @@ export default function CadastroChat() {
                   ? 'email-address'
                   : step === 'telefone'
                   ? 'phone-pad'
-                  : step === 'salario'
+                  : step === 'salario' || step === 'senha'
                   ? 'numeric'
                   : 'default'
               }
@@ -181,7 +191,7 @@ export default function CadastroChat() {
 function TypingIndicator() {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
-      <ActivityIndicator size="small" color="#FF6F00" />
+      <ActivityIndicator size="small" color="#3D5A80" />
       <Text style={{ marginLeft: 8, color: '#1A1A1A', fontWeight: '500' }}>Digitando...</Text>
     </View>
   );
@@ -204,7 +214,7 @@ const styles = StyleSheet.create({
     elevation: 1,
   },
   userBubble: {
-    backgroundColor: '#FF6F00',
+    backgroundColor: '#3D5A80',
     padding: 14,
     borderRadius: 20,
     marginTop: 4,
@@ -228,7 +238,7 @@ const styles = StyleSheet.create({
     borderColor: '#D0D0D0',
   },
   sendButton: {
-    backgroundColor: '#FF6F00',
+    backgroundColor: '#3D5A80',
     paddingHorizontal: 18,
     paddingVertical: 12,
     borderRadius: 12,
