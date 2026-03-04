@@ -8,9 +8,10 @@ const tabIcons: Record<string, { name: string; label: string }> = {
   'ganhos/index': { name: 'cash-outline', label: 'Ganhos' },
   'gastos/index': { name: 'receipt-outline', label: 'Gastos' },
   'perfil/index': { name: 'person-circle-outline', label: 'Perfil' },
+  'resumo/index': { name: 'pie-chart-outline', label: 'Resumo' },
 };
 
-const tabOrder = ['home/index', 'ganhos/index', 'gastos/index', 'perfil/index'];
+const tabOrder = ['home/index', 'ganhos/index', 'gastos/index', 'resumo/index','perfil/index'];
 
 export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const orderedRoutes = tabOrder
