@@ -1,4 +1,4 @@
-# 💰 MoneyMind - Full Stack Financial Ecosystem
+# 💰 MoneyMind - Gestão Financeira Mobile Full Stack
 
 ![React Native](https://img.shields.io/badge/React_Native-0.79-blue?style=for-the-badge&logo=react)
 ![Expo](https://img.shields.io/badge/Expo-53-black?style=for-the-badge&logo=expo)
