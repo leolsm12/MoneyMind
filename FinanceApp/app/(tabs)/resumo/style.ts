@@ -38,15 +38,36 @@ const styles = StyleSheet.create({
     color: '#222',
   },
   card: {
+    alignItems: 'center', // 👈 Adicione isso para centralizar o texto na horizontal
+    justifyContent: 'center', // 👈 Centraliza na vertical
+    padding: 20,
     backgroundColor: '#E0FBFC',
     borderRadius: 16,
-    padding: 20,
     marginBottom: 16,
     shadowColor: '#3D5A80',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
+  },
+  cardsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  halfCard: {
+    width: '48%',
+    padding: 12, // 👈 Diminui o estofamento interno para o texto respirar
+  },
+  halfCardLabel: {
+    fontSize: 14, // 👈 Deixa a palavra "Ganhos/Gastos" menorzinha
+  },
+  halfCardValue: {
+    fontSize: 18, // 👈 Deixa o número menor (ajuste se achar pequeno demais)
+  },
+  saldoCard: {
+    marginTop: 10, // 👈 Dá um respiro entre os cards de cima e o Saldo
+    marginBottom: 15, // Espaço antes da lista de transações
   },
   cardLabel: {
     fontSize: 16,

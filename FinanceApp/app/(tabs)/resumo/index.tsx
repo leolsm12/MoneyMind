@@ -121,17 +121,19 @@ export default function ResumoMensalScreen() {
         </View>
 
       {/* Cards resumo */}
-      <View style={styles.card}>
-        <Text style={styles.cardLabel}>Ganhos</Text>
-        <Text style={[styles.cardValue, { color: '#28A745' }]}>{formatarParaBRL(totalReceitas)}</Text>
+      <View style={styles.cardsRow}>
+        <View style={[styles.card, styles.halfCard]}>
+          <Text style={[styles.cardLabel, styles.halfCardLabel]}>Ganhos</Text>
+          <Text style={[styles.cardValue, styles.halfCardValue, { color: '#28A745' }]}>{formatarParaBRL(totalReceitas)}</Text>
+        </View>
+
+        <View style={[styles.card, styles.halfCard]}>
+          <Text style={[styles.cardLabel, styles.halfCardLabel]}>Gastos</Text>
+          <Text style={[styles.cardValue, styles.halfCardValue, { color: '#E60000' }]}>{formatarParaBRL(totalGastos)}</Text>
+        </View>
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.cardLabel}>Gastos</Text>
-        <Text style={[styles.cardValue, { color: '#E60000' }]}>{formatarParaBRL(totalGastos)}</Text>
-      </View>
-
-      <View style={styles.card}>
+      <View style={[styles.card, styles.saldoCard]}>
         <Text style={styles.cardLabel}>Saldo</Text>
         <Text style={[styles.cardValue, { color: saldo >= 0 ? '#3D5A80' : '#E60000' }]}>{formatarParaBRL(saldo)}</Text>
       </View>
