@@ -3,7 +3,7 @@ import { ThemedView } from '@/components/themed-view';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useFocusEffect } from 'expo-router';
+import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, FlatList, Image, TouchableOpacity, View } from 'react-native';
 import modernStyles from './style';
@@ -18,11 +18,13 @@ type Transacao = {
 
 export default function HomeScreen() {
   const [nomeUsuario, setNomeUsuario] = useState<string | null>(null);
+  const [imagemPerfil, setImagemPerfil] = useState<string | null>(null);
   const [ganhos, setGanhos] = useState<number | null>(null);
   const [gastos, setGastos] = useState<number | null>(null);
   const [transacoesRecentes, setTransacoesRecentes] = useState<Transacao[]>([]);
   const [loading, setLoading] = useState(true);
   const API_URL = process.env.EXPO_PUBLIC_API_URL;
+  const router = useRouter();
  
 
   const saldo = ganhos !== null && gastos !== null ? ganhos - gastos : 0;
@@ -41,6 +43,9 @@ export default function HomeScreen() {
 
         const transacoes = await fetchTransacoesRecentes();
         setTransacoesRecentes(transacoes);
+
+        const fotoSalva = await AsyncStorage.getItem('fotoPerfil');
+        setImagemPerfil(fotoSalva);
 
         const nome = await fetchNomeUsuario();
         setNomeUsuario(nome);
@@ -123,14 +128,15 @@ export default function HomeScreen() {
           <ThemedText style={modernStyles.greeting}>Olá, {nomeUsuario ?? 'usuário'} !</ThemedText>
           <ThemedText style={modernStyles.date}>{new Date().toLocaleDateString('pt-BR')}</ThemedText>
         </View>
-        <Image
-          source={require('@/assets/images/MoneyMindLogo.png')}
-          style={modernStyles.logo}
-          resizeMode="contain"
-        />
-        <TouchableOpacity style={modernStyles.profileButton}>
+        <TouchableOpacity 
+        style={modernStyles.profileButton}
+        onPress={() => router.push('/perfil')}>
           <Image
-            source={require('@/assets/images/avatars/avatar1.jpg')}
+            source={
+              imagemPerfil 
+                ? { uri: imagemPerfil } 
+                : require('@/assets/images/avatars/avatar1.jpg')
+            }
             style={modernStyles.profileIcon}
           />
         </TouchableOpacity>

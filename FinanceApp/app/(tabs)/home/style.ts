@@ -15,7 +15,7 @@ const modernStyles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 24,
-    marginBottom: 24,
+    marginBottom: 20,
   },
   greeting: {
     fontSize: 20,
@@ -28,12 +28,10 @@ const modernStyles = StyleSheet.create({
   },
   logo: {
     width: 120,
-    height: 40,
+    height: 100,
   },
   profileButton: {
-    backgroundColor: '#FFF',
-    borderRadius: 24,
-    padding: 8,
+    borderRadius: 24,    
     elevation: 2,
     shadowColor: '#000',
     shadowOpacity: 0.08,
@@ -41,8 +39,11 @@ const modernStyles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
   },
   profileIcon: {
-    width: 32,
-    height: 32,
+    width: 50,
+    height: 50,
+    borderRadius: 25, // Metade da largura/altura pra ficar um círculo perfeito
+    // 3. Garante que a foto preencha o círculo sem distorcer
+    resizeMode: 'cover',
   },
   mainCard: {
     width: width * 0.92,
@@ -173,6 +174,7 @@ const modernStyles = StyleSheet.create({
   valorGasto: {
     color: '#EE6C4D', // vermelho
   },
+ 
 });
 
 export default modernStyles;

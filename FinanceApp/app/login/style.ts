@@ -18,9 +18,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logo: {
-    width: 100,
-    height: 100,
-    marginBottom: 24,
+    width: '100%',
+    height: 250,
+    marginBottom: -50,
+    marginTop: -80,
+
+    
   },
   inputContainer: {
     flexDirection: 'row',

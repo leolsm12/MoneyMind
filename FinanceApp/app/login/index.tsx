@@ -62,7 +62,7 @@ export default function LoginScreen() {
     >
       <View style={styles.container}>
         <Image
-          source={require('../../assets/images/MoneyMindLogo.png')}
+          source={require('../../assets/images/MoneyMindLogo02.png')}
           style={styles.logo}
           resizeMode="contain"
         />
