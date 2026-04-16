@@ -56,19 +56,69 @@ export default function PerfilScreen() {
   buscarUsuario();
 }, []);
 
-  // 🔹 Escolher nova imagem
+  // 🔹 NOVA FUNÇÃO: Enviar a foto direto pro Java
+  const enviarFotoParaAPI = async (uri: string) => {
+    if (!usuarioId) {
+      Alert.alert('Erro', 'Usuário não identificado.');
+      return;
+    }
+
+    const token = await AsyncStorage.getItem('token');
+    if (!token) return;
+
+    const formData = new FormData();
+    formData.append('file', {
+      uri: uri,
+      name: 'foto_perfil.jpg',
+      type: 'image/jpeg',
+    } as any); // "as any" evita alertas chatos do TypeScript no FormData do React Native
+
+    try {
+      console.log('Enviando foto para a API...');
+      
+      // Mantivemos o fetch puro aqui porque ele lida melhor com FormData no React Native do que o Axios
+      const response = await fetch(`${API_URL}/usuarios/${usuarioId}/foto`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+
+      const responseText = await response.text();
+
+      if (response.ok) {
+        Alert.alert('Sucesso!', 'Sua foto de perfil foi atualizada.');
+      } else {
+        Alert.alert('Erro no Upload', responseText);
+      }
+    } catch (error) {
+      console.error('Erro ao enviar foto:', error);
+      Alert.alert('Erro de Conexão', 'Não foi possível enviar a foto para o servidor.');
+    }
+  };
+
+  // 🔹 Escolher nova imagem (Atualizado)
   const escolherImagem = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'], // Atualizado para a versão mais nova do Expo
       allowsEditing: true,
       aspect: [1, 1],
-      quality: 1,
+      quality: 0.8, // 0.8 é um ótimo equilíbrio entre qualidade e velocidade de upload
     });
 
     if (!result.canceled) {
       const uri = result.assets[0].uri;
+      
+      // 1. Atualiza a tela instantaneamente
       setImagemUri(uri);
+      
+      // 2. Salva localmente como backup
       await AsyncStorage.setItem('fotoPerfil', uri);
+      
+      // 3. Dispara a requisição pro back-end na mesma hora!
+      enviarFotoParaAPI(uri);
     }
   };
 
@@ -159,7 +209,9 @@ const salvarEdicao = async () => {
               </View>
               <View style={styles.infoRow}>
                 <MaterialIcons name="phone" size={20} color="#3D5A80" />
-                <Text style={styles.infoText}>{telefone || 'Telefone não informado'}</Text>
+                <Text style={styles.infoText}>
+                  {telefone ? telefone.replace(/(\d{2})(\d{1})(\d{4})(\d{4})/, '($1)$2 $3-$4') : 'Telefone não informado'}
+                  </Text>
               </View>
             </>
           ) : (

@@ -22,9 +22,8 @@ export default function TabLayout() {
       initialRouteName="home/index"
       tabBar={(props) => <CustomTabBar {...props} />}
     >
-      <Tabs.Screen name="home/index" options={{ title: 'Home' }} />
-      <Tabs.Screen name="ganhos/index" options={{ title: 'Conteúdo' }} />
-      <Tabs.Screen name="perfil/index" options={{ title: 'Perfil' }} />
+      
     </Tabs>
   );
 }
+
