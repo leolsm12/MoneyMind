@@ -22,11 +22,11 @@ export default function LoginScreen() {
 
     try {
       setLoading(true);
-      const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL}/usuarios/login`, {
+      /* const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL}/usuarios/login`, {
         email,
         senha,
       });
-      await AsyncStorage.setItem('token', response.data.token);
+      await AsyncStorage.setItem('token', response.data.token); */
       router.replace('/(tabs)/home');
     } catch (error: any) {
       if (error.response) {
