@@ -2,7 +2,7 @@ import { View, Text, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import styles from './style';
+import styles from '@/styles/home';
 import { Colors } from '@/constants/theme';
 
 export default function HomeScreen() {
@@ -18,7 +18,14 @@ export default function HomeScreen() {
       >
         <View style={styles.headerTop}>
           <View>
-            <Text style={styles.logoText}>💰 MoneyMind</Text>
+            <View style={styles.logoContainer}>
+              <Image
+                source={require('@/assets/MoneyIcon.png')}
+                style={styles.logoIcon}
+                resizeMode="contain"
+              />
+              <Text style={styles.logoText}>MoneyMind</Text>
+            </View>
             <Text style={styles.greeting}>Olá, Leo!</Text>
           </View>
           <TouchableOpacity

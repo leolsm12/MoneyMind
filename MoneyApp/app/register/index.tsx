@@ -8,7 +8,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import styles from './style';
+import styles from '@/styles/register';
 
 type Step = 'nome' | 'email' | 'telefone' | 'salario' | 'senha' | 'final';
 

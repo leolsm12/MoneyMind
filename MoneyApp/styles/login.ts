@@ -21,10 +21,9 @@ export default StyleSheet.create({
     elevation: 10,
   },
   logo: {
-    fontSize: FontSizes.xxl,
-    fontWeight: 'bold',
-    color: Colors.primary,
-    textAlign: 'center',
+    width: 200,
+    height: 100,
+    alignSelf: 'center',
     marginBottom: Spacing.xs,
   },
   subtitle: {

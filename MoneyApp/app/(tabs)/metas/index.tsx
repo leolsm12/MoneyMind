@@ -1,7 +1,7 @@
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import styles from './style';
+import styles from '@/styles/metas';
 import { Colors } from '@/constants/theme';
 
 type Meta = {

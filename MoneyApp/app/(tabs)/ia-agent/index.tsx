@@ -5,7 +5,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import styles from './style';
+import styles from '@/styles/ia-agent';
 import { Colors } from '@/constants/theme';
 
 type Mensagem = {

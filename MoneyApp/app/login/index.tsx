@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import styles from './style';
+import styles from '@/styles/login';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -47,8 +47,11 @@ export default function LoginScreen() {
       end={{ x: 1, y: 1 }}
     >
       <View style={styles.card}>
-
-        <Text style={styles.logo}>💰 MoneyMind</Text>
+        <Image
+          source={require('@/assets/MoneyLogo.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
         <Text style={styles.subtitle}>Sua vida financeira inteligente</Text>
 
         <View style={styles.inputContainer}>

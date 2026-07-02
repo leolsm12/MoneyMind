@@ -17,10 +17,20 @@ export default StyleSheet.create({
     alignItems: 'center',
     marginBottom: Spacing.lg,
   },
+  logoContainer: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: Spacing.xs,
+  },
+  logoIcon: {
+  width: 35,
+  height: 35,
+  },
   logoText: {
     fontSize: FontSizes.sm,
     color: 'rgba(255,255,255,0.7)',
     marginBottom: 2,
+    fontWeight: 'bold',
   },
   greeting: {
     fontSize: FontSizes.xxl,
