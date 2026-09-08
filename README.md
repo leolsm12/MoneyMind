@@ -21,7 +21,7 @@ O **MoneyMind** é uma solução completa para gestão financeira pessoal. Difer
     <td><img src="assets/extrato_todos.jpeg" alt="Extrato" width="200"/></td>
     <td><img src="assets/extrato_receitas.jpeg" alt="Extrato" width="200"/></td>
     <td><img src="assets/extrato_despesas.jpeg" alt="Extrato" width="200"/></td>
-    <td><img src="assets/perfil.jpeg" alt="Perfil" width="200"/></td>
+    <td><img src="assets/Perfil.jpeg" alt="Perfil" width="200"/></td>
   </tr>
 </table>
 
