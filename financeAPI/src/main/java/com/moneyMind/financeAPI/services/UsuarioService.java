@@ -1,5 +1,6 @@
 package com.moneyMind.financeAPI.services;
 
+import com.moneyMind.financeAPI.dtos.LoginRequestDTO;
 import com.moneyMind.financeAPI.dtos.UsuarioRequestDTO;
 import com.moneyMind.financeAPI.dtos.UsuarioResponseDTO;
 import com.moneyMind.financeAPI.models.Usuario;
@@ -47,19 +48,39 @@ public class UsuarioService {
         Usuario usuarioSalvo = repository.save(usuario);
 
         // Retorna o DTO de resposta limpo para o front-end (garantindo que a senha não vaze)
-        return new UsuarioResponseDTO(
-                usuarioSalvo.getId(),
-                usuarioSalvo.getNome(),
-                usuarioSalvo.getEmail(),
-                usuarioSalvo.getCpf(),
-                usuarioSalvo.getTelefone()
-        );
+        return converterParaResponseDTO(usuario);
     }
+
+    public UsuarioResponseDTO autenticar(LoginRequestDTO dto) {
+        // Busca o usuário pelo e-mail
+        Usuario usuario = repository.findByEmail(dto.email())
+                .orElseThrow(() -> new RuntimeException("E-mail ou senha inválidos!"));
+
+        // Compara a senha digitada em texto puro com o Hash salvo no banco usando o BCrypt
+        boolean senhaConfere = passwordEncoder.matches(dto.senha(), usuario.getSenha());
+
+        if (!senhaConfere) {
+            throw new RuntimeException("E-mail ou senha inválidos!");
+        }
+
+        // Se deu tudo certo, devolve os dados do usuário (em breve aqui entra a geração do Token JWT)
+        return converterParaResponseDTO(usuario);
+    }
+
 
     public UsuarioResponseDTO buscarPorId(UUID id) {
         Usuario usuario = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado!"));
 
+        return converterParaResponseDTO(usuario);
+
+
+    }
+
+    // =========================================================================
+    // MÉTODO AUXILIAR DE CONVERSÃO (Centraliza a regra do Response)
+    // =========================================================================
+    private UsuarioResponseDTO converterParaResponseDTO(Usuario usuario) {
         return new UsuarioResponseDTO(
                 usuario.getId(),
                 usuario.getNome(),
@@ -68,5 +89,4 @@ public class UsuarioService {
                 usuario.getTelefone()
         );
     }
-
 }
