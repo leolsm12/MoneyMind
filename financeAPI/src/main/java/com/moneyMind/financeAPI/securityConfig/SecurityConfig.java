@@ -30,6 +30,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
                         // Já deixa liberado o POST para o futuro login
                         .requestMatchers(HttpMethod.POST, "/usuarios/login").permitAll()
+                        // NOVO: Libera o GET para buscarmos o usuário pelo ID (O ** indica que pode vir qualquer UUID na frente)
+                        .requestMatchers(HttpMethod.GET, "/usuarios/**").permitAll()
 
                         // Qualquer outra requisição vai exigir que o usuário esteja autenticado com o Token
                         .anyRequest().authenticated()
