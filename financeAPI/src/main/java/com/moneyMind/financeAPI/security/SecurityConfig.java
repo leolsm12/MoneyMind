@@ -1,4 +1,4 @@
-package com.moneyMind.financeAPI.securityConfig;
+package com.moneyMind.financeAPI.security;
 
 
 import org.springframework.context.annotation.Bean;
@@ -10,36 +10,33 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
+    private final SecurityFilter securityFilter;
+    // Injetamos o filtro que acabamos de criar
+    public SecurityConfig(SecurityFilter securityFilter) {
+        this.securityFilter = securityFilter;
+    }
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                // Desabilita a proteção contra CSRF (como nossa API será Stateless com Token, não precisamos disso)
+                // Desabilita CSRF (adequado para APIs REST com JWT)
                 .csrf(csrf -> csrf.disable())
-
-                // Define que a API não vai guardar "sessão" do usuário na memória, cada requisição será independente
+                // API Stateless: o servidor não armazena sessão em memória
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
-                // Aqui é onde a mágica acontece: as regras de permissão
                 .authorizeHttpRequests(authorize -> authorize
-                        // Libera o POST para cadastro de usuário
+                        // 1. ROTAS PÚBLICAS: Cadastro e Login liberados para qualquer pessoa
                         .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
-                        // Já deixa liberado o POST para o futuro login
                         .requestMatchers(HttpMethod.POST, "/usuarios/login").permitAll()
-                        // NOVO: Libera o GET para buscarmos o usuário pelo ID (O ** indica que pode vir qualquer UUID na frente)
-                        .requestMatchers(HttpMethod.GET, "/usuarios/**").permitAll()
-
-                        // Qualquer outra requisição vai exigir que o usuário esteja autenticado com o Token
+                        // 2. ROTAS PROTEGIDAS: Qualquer outra rota (como GET /usuarios/{id}) exige o Token JWT
                         .anyRequest().authenticated()
                 )
+                // IMPORTANTE: Adiciona o nosso SecurityFilter ANTES do filtro padrão do Spring
+                .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
-
-    // Já criamos o Bean do PasswordEncoder para criptografar a senha no Service daqui a pouco
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

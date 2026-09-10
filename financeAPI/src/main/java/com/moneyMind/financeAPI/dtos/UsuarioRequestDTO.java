@@ -1,9 +1,8 @@
 package com.moneyMind.financeAPI.dtos;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
+
+import java.math.BigDecimal;
 
 public record UsuarioRequestDTO(
 
@@ -25,5 +24,8 @@ public record UsuarioRequestDTO(
         @NotBlank(message = "O telefone não pode estar em branco")
         // Aceita formatos como: 11999998888 ou +5511999998888 (apenas números e o opcional + no início)
         @Pattern(regexp = "^\\+?[1-9][0-9]{10,13}$", message = "Formato de telefone inválido. Informe o DDD seguido do número.")
-        String telefone
+        String telefone,
+
+        @PositiveOrZero(message = "O salário não pode ser negativo")
+        BigDecimal salario
 ) {}

@@ -4,6 +4,7 @@ package com.moneyMind.financeAPI.models;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -27,6 +28,9 @@ public class Usuario {
 
     @Column(nullable = false, length = 15)
     private String telefone;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal salario;
 
     @Column(nullable = false)
     private String senha;

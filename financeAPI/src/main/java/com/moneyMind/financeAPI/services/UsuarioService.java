@@ -1,10 +1,12 @@
 package com.moneyMind.financeAPI.services;
 
 import com.moneyMind.financeAPI.dtos.LoginRequestDTO;
+import com.moneyMind.financeAPI.dtos.LoginResponseDTO;
 import com.moneyMind.financeAPI.dtos.UsuarioRequestDTO;
 import com.moneyMind.financeAPI.dtos.UsuarioResponseDTO;
 import com.moneyMind.financeAPI.models.Usuario;
 import com.moneyMind.financeAPI.repositories.UsuarioRepository;
+import com.moneyMind.financeAPI.security.TokenService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,11 +17,13 @@ public class UsuarioService {
 
     private final UsuarioRepository repository;
     private final PasswordEncoder passwordEncoder; // 2. Declaramos a dependência do encoder
+    private final TokenService tokenService ; // <-- 1. Injetamos o TokenService
 
     // 3. O Spring injeta automaticamente tanto o Repository quanto o PasswordEncoder aqui pelo construtor
-    public UsuarioService(UsuarioRepository repository, PasswordEncoder passwordEncoder) {
+    public UsuarioService(UsuarioRepository repository, PasswordEncoder passwordEncoder, TokenService tokenService) {
         this.repository = repository;
         this.passwordEncoder = passwordEncoder;
+        this.tokenService = tokenService;
     }
 
     public UsuarioResponseDTO criarUsuario(UsuarioRequestDTO dto) {
@@ -43,6 +47,7 @@ public class UsuarioService {
         usuario.setSenha(senhaCriptografada); // <-- Salvamos o HASH, nunca a senha pura!
         usuario.setCpf(dto.cpf());
         usuario.setTelefone(dto.telefone());
+        usuario.setSalario(dto.salario()); // <-- 2. Salvamos o salário/renda
 
         // Salva a entidade no banco de dados (PostgreSQL)
         Usuario usuarioSalvo = repository.save(usuario);
@@ -51,7 +56,7 @@ public class UsuarioService {
         return converterParaResponseDTO(usuario);
     }
 
-    public UsuarioResponseDTO autenticar(LoginRequestDTO dto) {
+    public LoginResponseDTO autenticar(LoginRequestDTO dto) {
         // Busca o usuário pelo e-mail
         Usuario usuario = repository.findByEmail(dto.email())
                 .orElseThrow(() -> new RuntimeException("E-mail ou senha inválidos!"));
@@ -63,8 +68,10 @@ public class UsuarioService {
             throw new RuntimeException("E-mail ou senha inválidos!");
         }
 
-        // Se deu tudo certo, devolve os dados do usuário (em breve aqui entra a geração do Token JWT)
-        return converterParaResponseDTO(usuario);
+        // Gera o token JWT assinado
+        String token = tokenService.gerarToken(usuario);
+        // Devolve o token + os dados do usuário
+        return new LoginResponseDTO(token, converterParaResponseDTO(usuario));
     }
 
 
@@ -86,7 +93,8 @@ public class UsuarioService {
                 usuario.getNome(),
                 usuario.getEmail(),
                 usuario.getCpf(),
-                usuario.getTelefone()
+                usuario.getTelefone(),
+                usuario.getSalario()
         );
     }
 }

@@ -1,5 +1,6 @@
 package com.moneyMind.financeAPI.dtos;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 public record UsuarioResponseDTO(
@@ -7,5 +8,6 @@ public record UsuarioResponseDTO(
         String nome,
         String email,
         String cpf,
-        String telefone
+        String telefone,
+        BigDecimal salario
 ) {}

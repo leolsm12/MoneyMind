@@ -2,6 +2,7 @@ package com.moneyMind.financeAPI.controllers;
 
 
 import com.moneyMind.financeAPI.dtos.LoginRequestDTO;
+import com.moneyMind.financeAPI.dtos.LoginResponseDTO;
 import com.moneyMind.financeAPI.dtos.UsuarioRequestDTO;
 import com.moneyMind.financeAPI.dtos.UsuarioResponseDTO;
 import com.moneyMind.financeAPI.services.UsuarioService;
@@ -29,8 +30,8 @@ public class UsuarioController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UsuarioResponseDTO> login(@RequestBody @Valid LoginRequestDTO requestDTO) {
-        UsuarioResponseDTO responseDTO = service.autenticar(requestDTO);
+    public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid LoginRequestDTO requestDTO) {
+        LoginResponseDTO responseDTO = service.autenticar(requestDTO);
         return ResponseEntity.ok(responseDTO);
     }
 
