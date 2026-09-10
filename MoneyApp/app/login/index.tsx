@@ -22,17 +22,36 @@ export default function LoginScreen() {
 
     try {
       setLoading(true);
-      /* const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL}/usuarios/login`, {
+
+      // 1. Dispara o POST para o Spring Boot
+       const response = await axios.post(`${process.env.EXPO_PUBLIC_API_URL}/usuarios/login`, {
         email,
         senha,
       });
-      await AsyncStorage.setItem('token', response.data.token); */
+      // 2. Salva o Token JWT no armazenamento do celular
+      await AsyncStorage.setItem('token', response.data.token); 
+
+      // 3. (Opcional) Salva os dados do usuário para usarmos na Home e no Perfil
+      await AsyncStorage.setItem('usuario', JSON.stringify(response.data.usuario));
+
+      // 4. Redireciona para o fluxo autenticado
       router.replace('/(tabs)/home');
+    
     } catch (error: any) {
-      if (error.response) {
-        alert('Email ou senha inválidos.');
-      } else {
+      // Imprime o erro detalhado no terminal do Expo para vermos
+      console.log('STATUS DO ERRO:', error.response?.status);
+      console.log('DADOS DO ERRO:', error.response?.data);
+      console.log('MENSAGEM:', error.message);
+
+      // Pega a mensagem de erro que o GlobalExceptionHandler do Spring enviou
+      const mensagemBackend = error.response?.data?.erro;
+
+      if (mensagemBackend) {
+        alert(mensagemBackend);
+      } else if (error.response) {
         alert('Não foi possível conectar ao servidor.');
+      }else {
+        alert('Não foi possível conectar ao servidor. Verifique se o backend está rodando e o IP do .env.');
       }
     } finally {
       setLoading(false);

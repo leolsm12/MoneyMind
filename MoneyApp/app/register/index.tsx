@@ -10,22 +10,23 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import styles from '@/styles/register';
 
-type Step = 'nome' | 'email' | 'telefone' | 'salario' | 'senha' | 'final';
+type Step = 'nome' | 'email' | 'telefone' | 'cpf' | 'salario' | 'senha' | 'final';
 
 const steps: Record<Step, { question: string; icon: string }> = {
   nome:     { question: 'Olá! Como posso te chamar? 😊',         icon: 'person-outline' },
   email:    { question: 'Qual é o seu e-mail?',                   icon: 'mail-outline' },
   telefone: { question: 'E seu telefone?',                        icon: 'call-outline' },
+  cpf:      { question: 'Qual é o seu CPF? (Apenas 11 números) 🪪',      icon: 'card-outline' },
   salario:  { question: 'Qual é a sua renda mensal? 💰',          icon: 'cash-outline' },
   senha:    { question: 'Crie uma senha segura para sua conta 🔒', icon: 'lock-closed-outline' },
   final:    { question: '',                                        icon: '' },
 };
 
-const stepOrder: Step[] = ['nome', 'email', 'telefone', 'salario', 'senha', 'final'];
+const stepOrder: Step[] = ['nome', 'email', 'telefone', 'cpf', 'salario', 'senha', 'final'];
 
 export default function RegisterScreen() {
   const [step, setStep] = useState<Step>('nome');
-  const [answers, setAnswers] = useState({ nome: '', email: '', telefone: '', salario: '', senha: '' });
+  const [answers, setAnswers] = useState({ nome: '', email: '', telefone: '', cpf: '', salario: '', senha: '' });
   const [input, setInput] = useState('');
   const [typing, setTyping] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -70,7 +71,9 @@ export default function RegisterScreen() {
         `${process.env.EXPO_PUBLIC_API_URL}/usuarios/login`,
         { email, senha }
       );
+      // Salva o token e o usuário no celular
       await AsyncStorage.setItem('token', response.data.token);
+      await AsyncStorage.setItem('usuario', JSON.stringify(response.data.usuario));
       return true;
     } catch {
       return false;
@@ -80,19 +83,34 @@ export default function RegisterScreen() {
   const enviarCadastro = async (data: typeof answers) => {
     try {
       setLoading(true);
+
+      // Limpa pontuações de CPF e telefone para enviar apenas números
+      const cpfLimpo = data.cpf.replace(/\D/g, '');
+      const telefoneLimpo = data.telefone.replace(/\D/g, '');
+      const salarioNumerico = parseFloat(data.salario.replace(',', '.')) || 0;
+
       await axios.post(`${process.env.EXPO_PUBLIC_API_URL}/usuarios`, {
         nome: data.nome,
         email: data.email,
         telefone: data.telefone,
+        cpf: data.cpf,
         senha: data.senha,
         salario: parseFloat(data.salario),
       });
+
+      // Já loga automaticamente após cadastrar
       const ok = await login(data.email, data.senha);
       if (ok) router.replace('/(tabs)/home');
-    } catch {
-      alert('Erro ao cadastrar. Tente novamente.');
+
+    } catch (error: any) {
+
+      // Pega a mensagem de erro específica do backend se houver (ex: CPF já cadastrado)
+      const erroBackend = error.response?.data?.erro || Object.values(error.response?.data || {})[0];
+      alert(erroBackend || 'Erro ao cadastrar. Tente novamente.');
+
+       // Volta para o início se falhar
       setStep('nome');
-      setAnswers({ nome: '', email: '', telefone: '', salario: '', senha: '' });
+      setAnswers({ nome: '', email: '', telefone: '', cpf: '', salario: '', senha: '' });
     } finally {
       setLoading(false);
     }
@@ -189,6 +207,7 @@ export default function RegisterScreen() {
                 keyboardType={
                   step === 'email' ? 'email-address' :
                   step === 'telefone' ? 'phone-pad' :
+                  step === 'cpf' ? 'numeric' :
                   step === 'salario' ? 'decimal-pad' : 'default'
                 }
                 autoCapitalize={step === 'nome' ? 'words' : 'none'}
