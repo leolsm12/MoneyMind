@@ -27,6 +27,8 @@ public class SecurityConfig {
                 // API Stateless: o servidor não armazena sessão em memória
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
+                        // Libera requisições preflight (OPTIONS) que o Axios/Mobile faz
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         // 1. ROTAS PÚBLICAS: Cadastro e Login liberados para qualquer pessoa
                         .requestMatchers(HttpMethod.POST, "/usuarios").permitAll()
                         .requestMatchers(HttpMethod.POST, "/usuarios/login").permitAll()
